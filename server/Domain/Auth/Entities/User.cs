@@ -2,50 +2,51 @@
 
 public class User
 {
-    private string _displayName = string.Empty;
+    private string _userName = string.Empty;
 
     private User() { } // For EF Core
 
     public Guid Id { get; private set; }
     public string PasswordHash { get; private set; } = string.Empty;
 
-    public string DisplayName
+    // Users are invited and must register with a code
+    public string RegistrationCode { get; private set; }
+    public bool IsActive { get; private set; }
+
+    public string UserName
     {
-        get => _displayName;
+        get => _userName;
         private set
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Display name cannot be empty or whitespace.", nameof(DisplayName));
+                throw new ArgumentException("User name cannot be empty or whitespace.", nameof(UserName));
 
-            _displayName = value;
+            _userName = value;
         }
     }
 
     public DateTime CreatedAt { get; private set; }
 
-    public static User Create(string displayName, string passwordHash)
+    public static User Create(string userName)
     {
-        if (string.IsNullOrWhiteSpace(displayName))
-            throw new ArgumentException("Display name cannot be empty or whitespace.", nameof(displayName));
-
-        if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new ArgumentException("Password hash cannot be empty or whitespace.", nameof(passwordHash));
+        if (string.IsNullOrWhiteSpace(userName))
+            throw new ArgumentException("User name cannot be empty or whitespace.", nameof(userName));
 
         return new User
         {
             Id = Guid.NewGuid(),
-            DisplayName = displayName,
-            PasswordHash = passwordHash,
+            UserName = userName,
+            PasswordHash = "",
             CreatedAt = DateTime.UtcNow
         };
     }
 
-    public void UpdateDisplayName(string newDisplayName)
+    public void UpdateUserName(string newUserName)
     {
-        if (string.IsNullOrWhiteSpace(newDisplayName))
-            throw new ArgumentException("Display name cannot be empty or whitespace.", nameof(newDisplayName));
+        if (string.IsNullOrWhiteSpace(newUserName))
+            throw new ArgumentException("User name cannot be empty or whitespace.", nameof(newUserName));
 
-        DisplayName = newDisplayName;
+        UserName = newUserName;
     }
 
     public void UpdatePassword(string newPasswordHash)

@@ -20,15 +20,21 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User?> GetByDisplayNameAsync(string displayName, CancellationToken cancellationToken = default)
+    public async Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.DisplayName == displayName, cancellationToken);
+            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
     }
 
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Users
             .FindAsync([id], cancellationToken);
+    }
+
+    public async Task<User?> GetByRegistrationCodeAsync(string registrationCode, CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.RegistrationCode == registrationCode, cancellationToken);
     }
 }

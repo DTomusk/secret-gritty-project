@@ -1,6 +1,6 @@
 ﻿using Api.Auth.DTOs;
-using Api.Shared.RateLimiting;
 using Api.Shared.Extensions;
+using Api.Shared.RateLimiting;
 using Application.Auth.Commands;
 using Application.Auth.DTOs;
 using Application.Shared.Interfaces;
@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var command = new RegisterUserCommand(request.DisplayName, request.Password);
+        var command = new RegisterUserCommand(request.RegistrationCode, request.Password);
         var authResult = await _registerHandler.HandleAsync(command, cancellationToken);
 
         return authResult.ToActionResult();
@@ -42,9 +42,22 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserRequest request, CancellationToken cancellationToken)
     {
-        var command = new LoginUserCommand(request.DisplayName, request.Password);
+        var command = new LoginUserCommand(request.UserName, request.Password);
         var authResult = await _loginHandler.HandleAsync(command, cancellationToken);
 
+        return authResult.ToActionResult();
+    }
+
+    // Note: this needs to be admin only once we have roles and permissions
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var command = new CreateUserCommand(request.UserName);
+        var authResult = await _registerHandler.HandleAsync(command, cancellationToken);
         return authResult.ToActionResult();
     }
 }

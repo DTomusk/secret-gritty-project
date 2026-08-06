@@ -24,10 +24,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.DisplayName)
+            entity.Property(e => e.UserName)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.HasIndex(e => e.DisplayName)
+            entity.HasIndex(e => e.UserName)
                 .IsUnique();
             entity.Property(e => e.PasswordHash)
                 .IsRequired();

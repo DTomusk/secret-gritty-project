@@ -1,3 +1,3 @@
 ﻿namespace Api.Auth.DTOs;
 
-public record LoginUserRequest(string DisplayName, string Password);
+public record LoginUserRequest(string UserName, string Password);

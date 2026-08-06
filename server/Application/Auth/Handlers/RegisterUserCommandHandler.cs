@@ -2,7 +2,6 @@
 using Application.Auth.DTOs;
 using Application.Auth.Interfaces;
 using Application.Shared.Interfaces;
-using Domain.Auth.Entities;
 using Domain.Auth.Events;
 using Domain.Shared.Results;
 
@@ -25,12 +24,14 @@ public class RegisterUserCommandHandler(
         RegisterUserCommand command,
         CancellationToken cancellationToken = default)
     {
-        var existingUser = await _userRepository.GetByDisplayNameAsync(command.DisplayName, cancellationToken);
-        if (existingUser != null)
-            return Result<AuthResponse>.Failure(new Error("User with the same display name already exists.", ErrorType.Validation));
+        var existingUser = await _userRepository.GetByRegistrationCodeAsync(command.RegistrationCode, cancellationToken);
+        if (existingUser == null)
+            return Result<AuthResponse>.Failure(new Error("Invalid registration code.", ErrorType.Validation));
+
+        if (existingUser.IsActive)
+            return Result<AuthResponse>.Failure(new Error("Registration code has already been used.", ErrorType.Validation));
 
         var passwordHash = _passwordHasher.HashPassword(command.Password);
-        var user = User.Create(command.DisplayName, passwordHash);
 
         await _userRepository.CreateAsync(user, cancellationToken);
 

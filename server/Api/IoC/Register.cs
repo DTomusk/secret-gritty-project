@@ -18,6 +18,7 @@ public static class Register
         // FluentValidation
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<RegisterUserRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 
         // JWT auth
         var jwtOptions = configuration.GetSection("JwtOptions");
