@@ -4,6 +4,7 @@ using Api.Shared.RateLimiting;
 using Application.Auth.Commands;
 using Application.Auth.DTOs;
 using Application.Shared.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -51,8 +52,8 @@ public class AuthController : ControllerBase
         return authResult.ToActionResult();
     }
 
-    // Note: this needs to be admin only once we have roles and permissions
     [HttpPost("create")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

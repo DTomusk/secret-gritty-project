@@ -32,6 +32,14 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
     }
 
+    public async Task<User?> GetByUserNameWithRolesAsync(string userName, CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+    }
+
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Users
@@ -41,6 +49,8 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByRegistrationCodeAsync(RegistrationCode registrationCode, CancellationToken cancellationToken = default)
     {
         return await _context.Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.RegistrationCode == registrationCode, cancellationToken);
     }
 }
