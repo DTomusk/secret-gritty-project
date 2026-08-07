@@ -56,4 +56,12 @@ public class User
 
         PasswordHash = newPasswordHash;
     }
+
+    public void ActivateUser(string passwordHash)
+    {
+        if (string.IsNullOrWhiteSpace(passwordHash))
+            throw new ArgumentException("Password hash cannot be empty or whitespace.", nameof(passwordHash));
+        PasswordHash = passwordHash;
+        IsActive = true;
+    }
 }

@@ -29,21 +29,22 @@ public class LoginUserCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
@@ -54,7 +55,7 @@ public class LoginUserCommandHandlerTests
         result.Error.Should().BeNull();
         result.Value.Should().NotBeNull();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.DisplayName.Should().Be(displayName);
+        result.Value.UserName.Should().Be(userName);
         result.Value.Token.Should().Be(token);
     }
 
@@ -62,11 +63,11 @@ public class LoginUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_Failure_When_User_Not_Found()
     {
         // Arrange
-        var displayName = "nonexistentuser";
+        var userName = "nonexistentuser";
         var password = "password123";
-        var command = new LoginUserCommand(displayName, password);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         // Act
@@ -75,7 +76,7 @@ public class LoginUserCommandHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNull();
-        result.Error.Message.Should().Be("Invalid display name or password.");
+        result.Error.Message.Should().Be("Invalid user name or password.");
         result.Error.Type.Should().Be(ErrorType.Validation);
     }
 
@@ -83,14 +84,15 @@ public class LoginUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_Failure_When_Password_Is_Invalid()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "wrongpassword";
         var passwordHash = "hashed_password";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
@@ -102,57 +104,59 @@ public class LoginUserCommandHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNull();
-        result.Error.Message.Should().Be("Invalid display name or password.");
+        result.Error.Message.Should().Be("Invalid user name or password.");
         result.Error.Type.Should().Be(ErrorType.Validation);
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Call_GetByDisplayNameAsync_With_Correct_Parameters()
+    public async Task HandleAsync_Should_Call_GetByUserNameAsync_With_Correct_Parameters()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
         await _handler.HandleAsync(command);
 
         // Assert
-        await _userRepository.Received(1).GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>());
+        await _userRepository.Received(1).GetByUserNameAsync(userName, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task HandleAsync_Should_Call_VerifyPassword_With_Correct_Parameters_When_User_Found()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
@@ -167,39 +171,40 @@ public class LoginUserCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.Received(1).GenerateToken(user.Id, displayName);
+        _tokenGenerator.Received(1).GenerateToken(user.Id, userName);
     }
 
     [Fact]
     public async Task HandleAsync_Should_Not_Call_GenerateToken_When_User_Not_Found()
     {
         // Arrange
-        var displayName = "nonexistentuser";
+        var userName = "nonexistentuser";
         var password = "password123";
-        var command = new LoginUserCommand(displayName, password);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         // Act
@@ -213,14 +218,15 @@ public class LoginUserCommandHandlerTests
     public async Task HandleAsync_Should_Not_Call_GenerateToken_When_Password_Invalid()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "wrongpassword";
         var passwordHash = "hashed_password";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
@@ -237,50 +243,52 @@ public class LoginUserCommandHandlerTests
     public async Task HandleAsync_Should_Pass_CancellationToken_To_Repository()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
         var cancellationToken = new CancellationToken();
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, cancellationToken)
+        _userRepository.GetByUserNameAsync(userName, cancellationToken)
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
         await _handler.HandleAsync(command, cancellationToken);
 
         // Assert
-        await _userRepository.Received(1).GetByDisplayNameAsync(displayName, cancellationToken);
+        await _userRepository.Received(1).GetByUserNameAsync(userName, cancellationToken);
     }
 
     [Fact]
     public async Task HandleAsync_Should_Return_AuthResponse_With_User_Id_From_Repository()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
@@ -291,52 +299,54 @@ public class LoginUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_DisplayName()
+    public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_UserName()
     {
         // Arrange
-        var displayName = "testuser123";
+        var userName = "testuser123";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act
         var result = await _handler.HandleAsync(command);
 
         // Assert
-        result.Value.DisplayName.Should().Be(displayName);
+        result.Value.UserName.Should().Be(userName);
     }
 
     [Fact]
     public async Task HandleAsync_Should_Return_AuthResponse_With_Generated_Token()
     {
         // Arrange
-        var displayName = "testuser";
+        var userName = "testuser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "generated_jwt_token_12345";
 
-        var user = User.Create(displayName, passwordHash);
-        var command = new LoginUserCommand(displayName, password);
+        var user = User.Create(userName);
+        user.ActivateUser(passwordHash);
+        var command = new LoginUserCommand(userName, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
+        _userRepository.GetByUserNameAsync(userName, Arg.Any<CancellationToken>())
             .Returns(user);
 
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, displayName)
+        _tokenGenerator.GenerateToken(user.Id, userName)
             .Returns(token);
 
         // Act

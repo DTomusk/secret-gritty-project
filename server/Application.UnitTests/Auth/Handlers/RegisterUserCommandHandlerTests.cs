@@ -1,9 +1,8 @@
-﻿using Application.Auth.Commands;
+using Application.Auth.Commands;
 using Application.Auth.Handlers;
 using Application.Auth.Interfaces;
 using Application.Shared.Interfaces;
 using Domain.Auth.Entities;
-using Domain.Auth.Events;
 using Domain.Shared.Results;
 using FluentAssertions;
 using NSubstitute;
@@ -16,7 +15,6 @@ public class RegisterUserCommandHandlerTests
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenGenerator _tokenGenerator;
-    private readonly IDomainEventPublisher _eventPublisher;
     private readonly IUnitOfWork _unitOfWork;
 
     private readonly RegisterUserCommandHandler _handler;
@@ -26,28 +24,30 @@ public class RegisterUserCommandHandlerTests
         _userRepository = Substitute.For<IUserRepository>();
         _passwordHasher = Substitute.For<IPasswordHasher>();
         _tokenGenerator = Substitute.For<ITokenGenerator>();
-        _eventPublisher = Substitute.For<IDomainEventPublisher>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
-        _handler = new RegisterUserCommandHandler(_userRepository, _passwordHasher, _tokenGenerator, _eventPublisher, _unitOfWork);
+        _handler = new RegisterUserCommandHandler(_userRepository, _passwordHasher, _tokenGenerator, _unitOfWork);
     }
 
     [Fact]
     public async Task HandleAsync_Should_Return_Success_With_AuthResponse_When_User_Registered_Successfully()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(invitedUser.Id, userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -60,24 +60,21 @@ public class RegisterUserCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Error.Should().BeNull();
         result.Value.Should().NotBeNull();
-        result.Value.DisplayName.Should().Be(displayName);
+        result.Value.UserName.Should().Be(userName);
         result.Value.Token.Should().Be(token);
-        result.Value.UserId.Should().NotBe(Guid.Empty);
+        result.Value.UserId.Should().Be(invitedUser.Id);
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Return_Failure_When_User_Already_Exists()
+    public async Task HandleAsync_Should_Return_Failure_When_Registration_Code_Is_Invalid()
     {
         // Arrange
-        var displayName = "existinguser";
+        var registrationCode = "invalid_code";
         var password = "password123";
-        var passwordHash = "hashed_password";
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        var existingUser = User.Create(displayName, passwordHash);
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns((User?)null);
 
         // Act
         var result = await _handler.HandleAsync(command);
@@ -85,27 +82,54 @@ public class RegisterUserCommandHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNull();
-        result.Error.Message.Should().Be("User with the same display name already exists.");
+        result.Error.Message.Should().Be("Invalid registration code.");
         result.Error.Type.Should().Be(ErrorType.Validation);
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Call_GetByDisplayNameAsync_To_Check_Existing_User()
+    public async Task HandleAsync_Should_Return_Failure_When_Registration_Code_Already_Used()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var password = "password123";
+        var command = new RegisterUserCommand(registrationCode, password);
+
+        var activeUser = User.Create("inviteduser");
+        activeUser.ActivateUser("existing_password_hash");
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(activeUser);
+
+        // Act
+        var result = await _handler.HandleAsync(command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().NotBeNull();
+        result.Error.Message.Should().Be("Registration code has already been used.");
+        result.Error.Type.Should().Be(ErrorType.Validation);
+    }
+
+    [Fact]
+    public async Task HandleAsync_Should_Call_GetByRegistrationCodeAsync_With_Correct_Code()
+    {
+        // Arrange
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -115,26 +139,29 @@ public class RegisterUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        await _userRepository.Received(1).GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>());
+        await _userRepository.Received(1).GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task HandleAsync_Should_Hash_Password_With_Correct_Value()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -148,22 +175,25 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Create_User_In_Repository()
+    public async Task HandleAsync_Should_Activate_User_With_Password_Hash()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -173,28 +203,31 @@ public class RegisterUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        await _userRepository.Received(1).CreateAsync(
-            Arg.Is<User>(u => u.DisplayName == displayName && u.PasswordHash == passwordHash),
+        await _userRepository.Received(1).UpdateAsync(
+            Arg.Is<User>(u => u.UserName == userName && u.IsActive && u.PasswordHash == passwordHash),
             Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Generate_Token_With_User_Id_And_DisplayName()
+    public async Task HandleAsync_Should_Generate_Token_With_User_Id_And_UserName()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(invitedUser.Id, userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -204,59 +237,29 @@ public class RegisterUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.Received(1).GenerateToken(Arg.Any<Guid>(), displayName);
+        _tokenGenerator.Received(1).GenerateToken(invitedUser.Id, userName);
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Publish_UserCreatedEvent_With_Correct_Data()
+    public async Task HandleAsync_Should_Commit_Changes()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
-            .Returns(token);
-
-        _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
-            .Returns(1);
-
-        // Act
-        await _handler.HandleAsync(command);
-
-        // Assert
-        await _eventPublisher.Received(1).PublishAsync(
-            Arg.Is<UserCreatedEvent>(e =>
-                e.DisplayName == displayName &&
-                e.UserId != Guid.Empty),
-            Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Commit_Unit_Of_Work_After_Publishing_Event()
-    {
-        // Arrange
-        var displayName = "newuser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-        var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
-
-        _passwordHasher.HashPassword(password)
-            .Returns(passwordHash);
-
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -270,251 +273,25 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Not_Create_User_When_User_Already_Exists()
-    {
-        // Arrange
-        var displayName = "existinguser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-
-        var existingUser = User.Create(displayName, passwordHash);
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
-
-        // Act
-        await _handler.HandleAsync(command);
-
-        // Assert
-        await _userRepository.DidNotReceive().CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Not_Hash_Password_When_User_Already_Exists()
-    {
-        // Arrange
-        var displayName = "existinguser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-
-        var existingUser = User.Create(displayName, passwordHash);
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
-
-        // Act
-        await _handler.HandleAsync(command);
-
-        // Assert
-        _passwordHasher.DidNotReceive().HashPassword(Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Not_Generate_Token_When_User_Already_Exists()
-    {
-        // Arrange
-        var displayName = "existinguser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-
-        var existingUser = User.Create(displayName, passwordHash);
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
-
-        // Act
-        await _handler.HandleAsync(command);
-
-        // Assert
-        _tokenGenerator.DidNotReceive().GenerateToken(Arg.Any<Guid>(), Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Not_Publish_Event_When_User_Already_Exists()
-    {
-        // Arrange
-        var displayName = "existinguser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-
-        var existingUser = User.Create(displayName, passwordHash);
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
-
-        // Act
-        await _handler.HandleAsync(command);
-
-        // Assert
-        await _eventPublisher.DidNotReceive().PublishAsync(Arg.Any<UserCreatedEvent>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Not_Commit_Unit_Of_Work_When_User_Already_Exists()
-    {
-        // Arrange
-        var displayName = "existinguser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-
-        var existingUser = User.Create(displayName, passwordHash);
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
-
-        // Act
-        await _handler.HandleAsync(command);
-
-        // Assert
-        await _unitOfWork.DidNotReceive().CommitAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Pass_CancellationToken_To_Repository_GetByDisplayNameAsync()
-    {
-        // Arrange
-        var displayName = "newuser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-        var token = "jwt_token";
-        var cancellationToken = new CancellationToken();
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, cancellationToken)
-            .Returns((User?)null);
-
-        _passwordHasher.HashPassword(password)
-            .Returns(passwordHash);
-
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
-            .Returns(token);
-
-        _unitOfWork.CommitAsync(cancellationToken)
-            .Returns(1);
-
-        // Act
-        await _handler.HandleAsync(command, cancellationToken);
-
-        // Assert
-        await _userRepository.Received(1).GetByDisplayNameAsync(displayName, cancellationToken);
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Pass_CancellationToken_To_Repository_CreateAsync()
-    {
-        // Arrange
-        var displayName = "newuser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-        var token = "jwt_token";
-        var cancellationToken = new CancellationToken();
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, cancellationToken)
-            .Returns((User?)null);
-
-        _passwordHasher.HashPassword(password)
-            .Returns(passwordHash);
-
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
-            .Returns(token);
-
-        _unitOfWork.CommitAsync(cancellationToken)
-            .Returns(1);
-
-        // Act
-        await _handler.HandleAsync(command, cancellationToken);
-
-        // Assert
-        await _userRepository.Received(1).CreateAsync(
-            Arg.Any<User>(),
-            cancellationToken);
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Pass_CancellationToken_To_EventPublisher()
-    {
-        // Arrange
-        var displayName = "newuser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-        var token = "jwt_token";
-        var cancellationToken = new CancellationToken();
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, cancellationToken)
-            .Returns((User?)null);
-
-        _passwordHasher.HashPassword(password)
-            .Returns(passwordHash);
-
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
-            .Returns(token);
-
-        _unitOfWork.CommitAsync(cancellationToken)
-            .Returns(1);
-
-        // Act
-        await _handler.HandleAsync(command, cancellationToken);
-
-        // Assert
-        await _eventPublisher.Received(1).PublishAsync(
-            Arg.Any<UserCreatedEvent>(),
-            cancellationToken);
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Pass_CancellationToken_To_UnitOfWork()
-    {
-        // Arrange
-        var displayName = "newuser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-        var token = "jwt_token";
-        var cancellationToken = new CancellationToken();
-        var command = new RegisterUserCommand(displayName, password);
-
-        _userRepository.GetByDisplayNameAsync(displayName, cancellationToken)
-            .Returns((User?)null);
-
-        _passwordHasher.HashPassword(password)
-            .Returns(passwordHash);
-
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
-            .Returns(token);
-
-        _unitOfWork.CommitAsync(cancellationToken)
-            .Returns(1);
-
-        // Act
-        await _handler.HandleAsync(command, cancellationToken);
-
-        // Assert
-        await _unitOfWork.Received(1).CommitAsync(cancellationToken);
-    }
-
-    [Fact]
     public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_UserId()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(invitedUser.Id, userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -524,26 +301,29 @@ public class RegisterUserCommandHandlerTests
         var result = await _handler.HandleAsync(command);
 
         // Assert
-        result.Value.UserId.Should().NotBe(Guid.Empty);
+        result.Value.UserId.Should().Be(invitedUser.Id);
     }
 
     [Fact]
-    public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_DisplayName()
+    public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_UserName()
     {
         // Arrange
-        var displayName = "newuser123";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser123";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -553,26 +333,29 @@ public class RegisterUserCommandHandlerTests
         var result = await _handler.HandleAsync(command);
 
         // Assert
-        result.Value.DisplayName.Should().Be(displayName);
+        result.Value.UserName.Should().Be(userName);
     }
 
     [Fact]
     public async Task HandleAsync_Should_Return_AuthResponse_With_Generated_Token()
     {
         // Arrange
-        var displayName = "newuser";
+        var registrationCode = "reg_code_12345";
+        var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "generated_jwt_token_12345";
-        var command = new RegisterUserCommand(displayName, password);
+        var command = new RegisterUserCommand(registrationCode, password);
 
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
+        var invitedUser = User.Create(userName);
+
+        _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
+            .Returns(invitedUser);
 
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
+        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -583,40 +366,5 @@ public class RegisterUserCommandHandlerTests
 
         // Assert
         result.Value.Token.Should().Be(token);
-    }
-
-    [Fact]
-    public async Task HandleAsync_Should_Publish_Event_With_CreatedAt_From_User()
-    {
-        // Arrange
-        var displayName = "newuser";
-        var password = "password123";
-        var passwordHash = "hashed_password";
-        var token = "jwt_token";
-        var command = new RegisterUserCommand(displayName, password);
-        var beforeCreation = DateTime.UtcNow;
-
-        _userRepository.GetByDisplayNameAsync(displayName, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
-
-        _passwordHasher.HashPassword(password)
-            .Returns(passwordHash);
-
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), displayName)
-            .Returns(token);
-
-        _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
-            .Returns(1);
-
-        // Act
-        await _handler.HandleAsync(command);
-        var afterCreation = DateTime.UtcNow;
-
-        // Assert
-        await _eventPublisher.Received(1).PublishAsync(
-            Arg.Is<UserCreatedEvent>(e =>
-                e.CreatedAt >= beforeCreation &&
-                e.CreatedAt <= afterCreation),
-            Arg.Any<CancellationToken>());
     }
 }

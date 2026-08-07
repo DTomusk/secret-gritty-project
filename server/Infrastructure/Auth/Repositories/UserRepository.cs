@@ -20,6 +20,11 @@ public class UserRepository : IUserRepository
         return user;
     }
 
+    public async Task UpdateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        _context.Users.Update(user);
+    }
+
     public async Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         return await _context.Users

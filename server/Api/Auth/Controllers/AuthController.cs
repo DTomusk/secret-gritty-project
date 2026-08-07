@@ -16,13 +16,16 @@ public class AuthController : ControllerBase
 {
     private readonly ICommandHandler<LoginUserCommand, AuthResponse> _loginHandler;
     private readonly ICommandHandler<RegisterUserCommand, AuthResponse> _registerHandler;
+    private readonly ICommandHandler<CreateUserCommand> _createUserHandler;
 
     public AuthController(
         ICommandHandler<LoginUserCommand, AuthResponse> loginHandler,
-        ICommandHandler<RegisterUserCommand, AuthResponse> registerHandler)
+        ICommandHandler<RegisterUserCommand, AuthResponse> registerHandler,
+        ICommandHandler<CreateUserCommand> createUserHandler)
     {
         _loginHandler = loginHandler;
         _registerHandler = registerHandler;
+        _createUserHandler = createUserHandler;
     }
 
     [HttpPost("register")]
@@ -57,7 +60,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
         var command = new CreateUserCommand(request.UserName);
-        var authResult = await _registerHandler.HandleAsync(command, cancellationToken);
-        return authResult.ToActionResult();
+        var result = await _createUserHandler.HandleAsync(command, cancellationToken);
+        return result.ToActionResult();
     }
 }
