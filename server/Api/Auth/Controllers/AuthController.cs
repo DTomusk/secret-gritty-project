@@ -16,12 +16,12 @@ public class AuthController : ControllerBase
 {
     private readonly ICommandHandler<LoginUserCommand, AuthResponse> _loginHandler;
     private readonly ICommandHandler<RegisterUserCommand, AuthResponse> _registerHandler;
-    private readonly ICommandHandler<CreateUserCommand> _createUserHandler;
+    private readonly ICommandHandler<CreateUserCommand, CreateUserResponse> _createUserHandler;
 
     public AuthController(
         ICommandHandler<LoginUserCommand, AuthResponse> loginHandler,
         ICommandHandler<RegisterUserCommand, AuthResponse> registerHandler,
-        ICommandHandler<CreateUserCommand> createUserHandler)
+        ICommandHandler<CreateUserCommand, CreateUserResponse> createUserHandler)
     {
         _loginHandler = loginHandler;
         _registerHandler = registerHandler;
