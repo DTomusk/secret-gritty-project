@@ -1,4 +1,5 @@
 using Application.Auth.Commands;
+using Application.Auth.DTOs;
 using Application.Auth.Handlers;
 using Application.Auth.Interfaces;
 using Application.Shared.Interfaces;
@@ -48,7 +49,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(invitedUser.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -130,7 +131,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -162,7 +163,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -194,7 +195,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -228,7 +229,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(invitedUser.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -238,7 +239,7 @@ public class RegisterUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.Received(1).GenerateToken(invitedUser.Id, userName);
+        _tokenGenerator.Received(1).GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }));
     }
 
     [Fact]
@@ -260,7 +261,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -292,7 +293,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(invitedUser.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -324,7 +325,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -356,7 +357,7 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(Arg.Any<Guid>(), userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())

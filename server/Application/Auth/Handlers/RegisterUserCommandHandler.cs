@@ -39,7 +39,7 @@ public class RegisterUserCommandHandler(
 
         await _userRepository.UpdateAsync(existingUser, cancellationToken);
 
-        var token = _tokenGenerator.GenerateToken(existingUser.Id, existingUser.UserName);
+        var token = _tokenGenerator.GenerateToken(UserTokenData.FromUser(existingUser));
 
         await _unitOfWork.CommitAsync(cancellationToken);
 

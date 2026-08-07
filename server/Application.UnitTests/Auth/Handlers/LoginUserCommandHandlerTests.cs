@@ -1,4 +1,5 @@
 ﻿using Application.Auth.Commands;
+using Application.Auth.DTOs;
 using Application.Auth.Handlers;
 using Application.Auth.Interfaces;
 using Domain.Auth.Entities;
@@ -44,7 +45,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
@@ -127,7 +128,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
@@ -156,7 +157,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
@@ -186,14 +187,14 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.Received(1).GenerateToken(user.Id, userName);
+        _tokenGenerator.Received(1).GenerateToken(new UserTokenData(user.Id, userName, new string[] { }));
     }
 
     [Fact]
@@ -211,7 +212,7 @@ public class LoginUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.DidNotReceive().GenerateToken(Arg.Any<Guid>(), Arg.Any<string>());
+        _tokenGenerator.DidNotReceive().GenerateToken(Arg.Any<UserTokenData>());
     }
 
     [Fact]
@@ -236,7 +237,7 @@ public class LoginUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.DidNotReceive().GenerateToken(Arg.Any<Guid>(), Arg.Any<string>());
+        _tokenGenerator.DidNotReceive().GenerateToken(Arg.Any<UserTokenData>());
     }
 
     [Fact]
@@ -259,7 +260,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
@@ -288,7 +289,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
@@ -317,7 +318,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act
@@ -346,7 +347,7 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(user.Id, userName)
+        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
             .Returns(token);
 
         // Act

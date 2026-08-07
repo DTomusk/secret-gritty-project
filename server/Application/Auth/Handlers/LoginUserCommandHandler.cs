@@ -23,7 +23,7 @@ public class LoginUserCommandHandler(
         if (user == null || !_passwordHasher.VerifyPassword(command.Password, user.PasswordHash))
             return Result<AuthResponse>.Failure(new Error("Invalid user name or password.", ErrorType.Validation));
 
-        var token = _tokenGenerator.GenerateToken(user.Id, user.UserName);
+        var token = _tokenGenerator.GenerateToken(UserTokenData.FromUser(user));
         return Result<AuthResponse>.Success(new AuthResponse(user.Id, user.UserName, token));
     }
 }
