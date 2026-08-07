@@ -29,6 +29,8 @@ public class User
 
     public DateTime CreatedAt { get; private set; }
 
+    public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
+
     public static User Create(string userName)
     {
         if (string.IsNullOrWhiteSpace(userName))
@@ -66,5 +68,17 @@ public class User
             throw new ArgumentException("Password hash cannot be empty or whitespace.", nameof(passwordHash));
         PasswordHash = passwordHash;
         IsActive = true;
+    }
+
+    public void AssignRole(Role role)
+    {
+        if (role == null)
+            throw new ArgumentNullException(nameof(role), "Role cannot be null.");
+        if (UserRoles.Any(ur => ur.RoleId == role.Id))
+            throw new InvalidOperationException("User already has this role assigned.");
+        var result = UserRole.Create(this.Id, role.Id);
+        if (result.IsFailure)
+            throw new InvalidOperationException(result.Error.Message);
+        UserRoles.Add(result.Value);
     }
 }

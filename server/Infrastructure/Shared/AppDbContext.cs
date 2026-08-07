@@ -14,6 +14,10 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+
+    public DbSet<Role> Roles => Set<Role>();
+
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public DbSet<ProcessedEvent> ProcessedEvents => Set<ProcessedEvent>();
@@ -21,6 +25,37 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Configure UserRole entity
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.ToTable("UserRoles");
+            entity.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.UserRoles)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Role)
+                .WithMany(x => x.UserRoles)
+                .HasForeignKey(x => x.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(x => x.AssignedAt)
+                .IsRequired();
+        });
+
+        // Configure Role entity
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.HasIndex(r => r.Name)
+                .IsUnique();
+        });
 
         var registrationCodeConverter = new ValueConverter<RegistrationCode, string>(
             v => v.ToString(),

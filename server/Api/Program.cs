@@ -1,6 +1,7 @@
 using Api.IoC;
 using Application.IoC;
 using Infrastructure.IoC;
+using Infrastructure.Shared;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,5 +47,12 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapControllers();
+
+// Seed database
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedDataAsync();
+}
 
 app.Run();
