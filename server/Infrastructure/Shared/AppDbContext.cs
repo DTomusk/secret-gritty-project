@@ -1,6 +1,8 @@
 ﻿using Domain.Auth.Entities;
+using Domain.Auth.ValueObjects;
 using Domain.Shared.Events;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Shared;
 
@@ -20,6 +22,10 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        var registrationCodeConverter = new ValueConverter<RegistrationCode, string>(
+            v => v.ToString(),
+            v => RegistrationCode.Create(v).Value);
+
         // Configure User entity
         modelBuilder.Entity<User>(entity =>
         {
@@ -33,6 +39,9 @@ public class AppDbContext : DbContext
                 .IsRequired();
             entity.Property(e => e.CreatedAt)
                 .IsRequired();
+            entity.Property(e => e.RegistrationCode)
+                .IsRequired()
+                .HasConversion(registrationCodeConverter);
         });
 
         // Configure OutboxMessage entity

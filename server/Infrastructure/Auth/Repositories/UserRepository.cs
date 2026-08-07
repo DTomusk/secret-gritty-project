@@ -1,5 +1,6 @@
 ﻿using Application.Auth.Interfaces;
 using Domain.Auth.Entities;
+using Domain.Auth.ValueObjects;
 using Infrastructure.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,7 @@ public class UserRepository : IUserRepository
             .FindAsync([id], cancellationToken);
     }
 
-    public async Task<User?> GetByRegistrationCodeAsync(string registrationCode, CancellationToken cancellationToken = default)
+    public async Task<User?> GetByRegistrationCodeAsync(RegistrationCode registrationCode, CancellationToken cancellationToken = default)
     {
         return await _context.Users
             .FirstOrDefaultAsync(u => u.RegistrationCode == registrationCode, cancellationToken);

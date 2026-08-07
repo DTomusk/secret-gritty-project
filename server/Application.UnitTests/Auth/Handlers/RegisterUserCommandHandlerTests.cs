@@ -3,6 +3,7 @@ using Application.Auth.Handlers;
 using Application.Auth.Interfaces;
 using Application.Shared.Interfaces;
 using Domain.Auth.Entities;
+using Domain.Auth.ValueObjects;
 using Domain.Shared.Results;
 using FluentAssertions;
 using NSubstitute;
@@ -32,12 +33,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_Success_With_AuthResponse_When_User_Registered_Successfully()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -69,9 +70,9 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_Failure_When_Registration_Code_Is_Invalid()
     {
         // Arrange
-        var registrationCode = "invalid_code";
+        var registrationCode = new RegistrationCode();
         var password = "password123";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         _userRepository.GetByRegistrationCodeAsync(registrationCode, Arg.Any<CancellationToken>())
             .Returns((User?)null);
@@ -90,9 +91,9 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_Failure_When_Registration_Code_Already_Used()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var password = "password123";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var activeUser = User.Create("inviteduser");
         activeUser.ActivateUser("existing_password_hash");
@@ -114,12 +115,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Call_GetByRegistrationCodeAsync_With_Correct_Code()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -146,12 +147,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Hash_Password_With_Correct_Value()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -178,12 +179,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Activate_User_With_Password_Hash()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -212,12 +213,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Generate_Token_With_User_Id_And_UserName()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -244,12 +245,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Commit_Changes()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -276,12 +277,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_UserId()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -308,12 +309,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_AuthResponse_With_Correct_UserName()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser123";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "jwt_token";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 
@@ -340,12 +341,12 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_Should_Return_AuthResponse_With_Generated_Token()
     {
         // Arrange
-        var registrationCode = "reg_code_12345";
+        var registrationCode = new RegistrationCode();
         var userName = "inviteduser";
         var password = "password123";
         var passwordHash = "hashed_password";
         var token = "generated_jwt_token_12345";
-        var command = new RegisterUserCommand(registrationCode, password);
+        var command = new RegisterUserCommand(registrationCode.ToString(), password);
 
         var invitedUser = User.Create(userName);
 

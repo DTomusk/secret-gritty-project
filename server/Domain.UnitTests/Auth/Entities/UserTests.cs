@@ -18,7 +18,7 @@ public class UserTests
         // Assert
         user.Id.Should().NotBe(Guid.Empty);
         user.UserName.Should().Be(userName);
-        user.PasswordHash.Should().BeNull();
+        user.PasswordHash.Should().Be("");
         user.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 

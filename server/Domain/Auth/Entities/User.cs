@@ -1,4 +1,6 @@
-﻿namespace Domain.Auth.Entities;
+﻿using Domain.Auth.ValueObjects;
+
+namespace Domain.Auth.Entities;
 
 public class User
 {
@@ -10,7 +12,7 @@ public class User
     public string PasswordHash { get; private set; } = string.Empty;
 
     // Users are invited and must register with a code
-    public string RegistrationCode { get; private set; }
+    public RegistrationCode RegistrationCode { get; private set; }
     public bool IsActive { get; private set; }
 
     public string UserName
@@ -37,7 +39,8 @@ public class User
             Id = Guid.NewGuid(),
             UserName = userName,
             PasswordHash = "",
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            RegistrationCode = new RegistrationCode(),
         };
     }
 

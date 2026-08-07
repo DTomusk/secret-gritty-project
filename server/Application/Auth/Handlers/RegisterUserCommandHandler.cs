@@ -2,6 +2,7 @@
 using Application.Auth.DTOs;
 using Application.Auth.Interfaces;
 using Application.Shared.Interfaces;
+using Domain.Auth.ValueObjects;
 using Domain.Shared.Results;
 
 namespace Application.Auth.Handlers;
@@ -21,7 +22,11 @@ public class RegisterUserCommandHandler(
         RegisterUserCommand command,
         CancellationToken cancellationToken = default)
     {
-        var existingUser = await _userRepository.GetByRegistrationCodeAsync(command.RegistrationCode, cancellationToken);
+        var codeResult = RegistrationCode.Create(command.RegistrationCode);
+        if (codeResult.IsFailure)
+            return Result<AuthResponse>.Failure(codeResult.Error);
+
+        var existingUser = await _userRepository.GetByRegistrationCodeAsync(codeResult.Value, cancellationToken);
         if (existingUser == null)
             return Result<AuthResponse>.Failure(new Error("Invalid registration code.", ErrorType.Validation));
 
