@@ -1,7 +1,7 @@
 import { api } from "../../../lib/api/api"
 
-import type { LoginRequest, LoginResponse } from "../types/types";
+import type { LoginResponse, RegistrationRequest } from "../types/types";
 
-export const register = async (input: LoginRequest) => {
+export const register = async (input: RegistrationRequest) => {
     return api.post<LoginResponse>("/auth/register", JSON.stringify(input));
 }

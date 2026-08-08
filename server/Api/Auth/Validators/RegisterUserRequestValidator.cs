@@ -7,10 +7,9 @@ public class RegisterUserRequestValidator : AbstractValidator<RegisterUserReques
 {
     public RegisterUserRequestValidator()
     {
-        RuleFor(x => x.DisplayName)
+        RuleFor(x => x.RegistrationCode)
             .NotEmpty()
-            .MinimumLength(3)
-            .MaximumLength(50);
+            .Length(12);
         RuleFor(x => x.Password)
             .NotEmpty()
             .MinimumLength(8)

@@ -19,11 +19,11 @@ public class LoginUserCommandHandler(
         LoginUserCommand command,
         CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByDisplayNameAsync(command.DisplayName, cancellationToken);
+        var user = await _userRepository.GetByUserNameAsync(command.UserName, cancellationToken);
         if (user == null || !_passwordHasher.VerifyPassword(command.Password, user.PasswordHash))
-            return Result<AuthResponse>.Failure(new Error("Invalid display name or password.", ErrorType.Validation));
+            return Result<AuthResponse>.Failure(new Error("Invalid user name or password.", ErrorType.Validation));
 
-        var token = _tokenGenerator.GenerateToken(user.Id, user.DisplayName);
-        return Result<AuthResponse>.Success(new AuthResponse(user.Id, user.DisplayName, token));
+        var token = _tokenGenerator.GenerateToken(UserTokenData.FromUser(user));
+        return Result<AuthResponse>.Success(new AuthResponse(user.Id, user.UserName, token));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.Auth.Interfaces;
+﻿using Application.Auth.DTOs;
+using Application.Auth.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,18 +17,20 @@ public class JwtGenerator : ITokenGenerator
         _options = options.Value;
     }
 
-    public string GenerateToken(Guid userId, string displayName)
+    public string GenerateToken(UserTokenData tokenData)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, displayName),
+            new Claim(JwtRegisteredClaimNames.Sub, tokenData.UserId.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, tokenData.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, "User")
         };
+
+        foreach (var role in tokenData.Roles)
+            claims = claims.Append(new Claim(ClaimTypes.Role, role)).ToArray();
 
         var token = new JwtSecurityToken(
             issuer: _options.Issuer,

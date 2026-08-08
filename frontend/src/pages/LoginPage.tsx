@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import AuthForm from "../features/auth/components/AuthForm";
+import LoginForm from "../features/auth/components/LoginForm";
 import { useLogin } from "../features/auth/hooks/useLogin";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { useEffect } from "react";
@@ -23,6 +23,6 @@ export default function LoginPage() {
     }
 
     return (
-        <AuthForm mode="login" onSubmit={onSubmit} />
+        <LoginForm onSubmit={onSubmit} />
     )
 }

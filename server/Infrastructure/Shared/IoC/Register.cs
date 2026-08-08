@@ -19,6 +19,8 @@ public static class Register
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
+        services.AddScoped<DatabaseSeeder>();
+
         return services;
     }
 }

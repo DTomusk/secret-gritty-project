@@ -1,6 +1,8 @@
-﻿namespace Application.Auth.Interfaces;
+﻿using Application.Auth.DTOs;
+
+namespace Application.Auth.Interfaces;
 
 public interface ITokenGenerator
 {
-    string GenerateToken(Guid userId, string displayName);
+    string GenerateToken(UserTokenData tokenData);
 }

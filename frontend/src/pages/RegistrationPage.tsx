@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import AuthForm from "../features/auth/components/AuthForm";
+import RegistrationForm from "../features/auth/components/RegistrationForm";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { useRegister } from "../features/auth/hooks/useRegister";
-import type { LoginSchema } from "../features/auth/schemas/loginSchema";
+import type { RegisterSchema } from "../features/auth/schemas/registerSchema";
 import { useEffect } from "react";
 
 export default function RegistrationPage() {
@@ -16,13 +16,13 @@ export default function RegistrationPage() {
         }
     }, [isAuthenticated, navigate]);
 
-    const onSubmit = async (formData: LoginSchema) => {
+    const onSubmit = async (formData: RegisterSchema) => {
         const response = await mutation.mutateAsync(formData);
         await logIn(response.token);
         navigate("/auth/intro", { replace: true });
     }
 
     return (
-        <AuthForm mode="register" onSubmit={onSubmit} />
+        <RegistrationForm onSubmit={onSubmit} />
     )
 }
