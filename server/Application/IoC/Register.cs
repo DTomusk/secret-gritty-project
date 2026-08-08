@@ -2,6 +2,7 @@
 using Application.Auth.DTOs;
 using Application.Auth.Handlers;
 using Application.CalendarEvents.Commands;
+using Application.CalendarEvents.DTOs;
 using Application.CalendarEvents.Handlers;
 using Application.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,7 @@ public static class Register
         services.AddScoped<ICommandHandler<CreateUserCommand, CreateUserResponse>, CreateUserCommandHandler>();
 
         // CalendarEvent handlers
-        services.AddScoped<ICommandHandler<ScheduleEventCommand>, ScheduleEventCommandHandler>();
+        services.AddScoped<ICommandHandler<ScheduleEventCommand, ScheduleEventResponse>, ScheduleEventCommandHandler>();
         return services;
     }
 
