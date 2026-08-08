@@ -2,6 +2,7 @@
 using Domain.CalendarEvents.Entities;
 using Domain.Shared.Events;
 using Infrastructure.Auth.EF;
+using Infrastructure.CalendarEvents.EF;
 using Infrastructure.Shared.EF;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,7 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ConfigureAuthContext();
+        modelBuilder.ConfigureCalendarEventsContext();
         modelBuilder.ConfigureSharedContext();
     }
 }

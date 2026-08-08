@@ -1,6 +1,4 @@
-﻿using Domain.Auth.Entities;
-
-namespace Domain.CalendarEvents.Entities;
+﻿namespace Domain.CalendarEvents.Entities;
 
 public class CalendarEvent
 {
@@ -9,7 +7,6 @@ public class CalendarEvent
     public string Name { get; private set; }
     public DateOnly Date { get; private set; }
     public CalendarEventType EventType { get; private set; }
-    public User ScheduledByUser { get; private set; }
 
     private CalendarEvent() { }
 
