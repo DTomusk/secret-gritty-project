@@ -1,6 +1,8 @@
 ﻿using Application.Auth.Commands;
 using Application.Auth.DTOs;
 using Application.Auth.Handlers;
+using Application.CalendarEvents.Commands;
+using Application.CalendarEvents.Handlers;
 using Application.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,9 +12,14 @@ public static class Register
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        // TODO: split registration by bounded context
+        // Auth handlers
         services.AddScoped<ICommandHandler<LoginUserCommand, AuthResponse>, LoginUserCommandHandler>();
         services.AddScoped<ICommandHandler<RegisterUserCommand, AuthResponse>, RegisterUserCommandHandler>();
         services.AddScoped<ICommandHandler<CreateUserCommand, CreateUserResponse>, CreateUserCommandHandler>();
+
+        // CalendarEvent handlers
+        services.AddScoped<ICommandHandler<ScheduleEventCommand>, ScheduleEventCommandHandler>();
         return services;
     }
 
