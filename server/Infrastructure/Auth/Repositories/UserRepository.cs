@@ -29,12 +29,6 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
-    }
-
-    public async Task<User?> GetByUserNameWithRolesAsync(string userName, CancellationToken cancellationToken = default)
-    {
-        return await _context.Users
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);

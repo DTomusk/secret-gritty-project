@@ -49,7 +49,10 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
+        _tokenGenerator.GenerateToken(Arg.Is<UserTokenData>(x =>
+            x.UserId == invitedUser.Id &&
+            x.UserName == userName &&
+            x.Roles.SequenceEqual(invitedUser.UserRoles.Select(ur => ur.Role.Name))))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
@@ -239,7 +242,10 @@ public class RegisterUserCommandHandlerTests
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.Received(1).GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }));
+        _tokenGenerator.Received(1).GenerateToken(Arg.Is<UserTokenData>(x =>
+            x.UserId == invitedUser.Id &&
+            x.UserName == userName &&
+            x.Roles.SequenceEqual(invitedUser.UserRoles.Select(ur => ur.Role.Name))));
     }
 
     [Fact]
@@ -357,7 +363,10 @@ public class RegisterUserCommandHandlerTests
         _passwordHasher.HashPassword(password)
             .Returns(passwordHash);
 
-        _tokenGenerator.GenerateToken(new UserTokenData(invitedUser.Id, userName, new string[] { }))
+        _tokenGenerator.GenerateToken(Arg.Is<UserTokenData>(x =>
+            x.UserId == invitedUser.Id &&
+            x.UserName == userName &&
+            x.Roles.SequenceEqual(invitedUser.UserRoles.Select(ur => ur.Role.Name))))
             .Returns(token);
 
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())

@@ -19,7 +19,7 @@ public class LoginUserCommandHandler(
         LoginUserCommand command,
         CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByUserNameWithRolesAsync(command.UserName, cancellationToken);
+        var user = await _userRepository.GetByUserNameAsync(command.UserName, cancellationToken);
         if (user == null || !_passwordHasher.VerifyPassword(command.Password, user.PasswordHash))
             return Result<AuthResponse>.Failure(new Error("Invalid user name or password.", ErrorType.Validation));
 

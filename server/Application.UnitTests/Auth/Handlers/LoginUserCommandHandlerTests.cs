@@ -45,7 +45,10 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
+        _tokenGenerator.GenerateToken(Arg.Is<UserTokenData>(x =>
+            x.UserId == user.Id &&
+            x.UserName == userName &&
+            x.Roles.SequenceEqual(user.UserRoles.Select(ur => ur.Role.Name))))
             .Returns(token);
 
         // Act
@@ -187,14 +190,17 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
+        _tokenGenerator.GenerateToken(UserTokenData.FromUser(user))
             .Returns(token);
 
         // Act
         await _handler.HandleAsync(command);
 
         // Assert
-        _tokenGenerator.Received(1).GenerateToken(new UserTokenData(user.Id, userName, new string[] { }));
+        _tokenGenerator.Received(1).GenerateToken(Arg.Is<UserTokenData>(x =>
+            x.UserId == user.Id &&
+            x.UserName == userName &&
+            x.Roles.SequenceEqual(user.UserRoles.Select(ur => ur.Role.Name))));
     }
 
     [Fact]
@@ -347,7 +353,10 @@ public class LoginUserCommandHandlerTests
         _passwordHasher.VerifyPassword(password, passwordHash)
             .Returns(true);
 
-        _tokenGenerator.GenerateToken(new UserTokenData(user.Id, userName, new string[] { }))
+        _tokenGenerator.GenerateToken(Arg.Is<UserTokenData>(x =>
+            x.UserId == user.Id &&
+            x.UserName == userName &&
+            x.Roles.SequenceEqual(user.UserRoles.Select(ur => ur.Role.Name))))
             .Returns(token);
 
         // Act
