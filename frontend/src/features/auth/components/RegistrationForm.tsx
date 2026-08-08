@@ -3,22 +3,19 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router-dom";
-import type { LoginSchema } from "../schemas/loginSchema";
+import type { RegisterSchema } from "../schemas/registerSchema";
 
-type AuthMode = "login" | "register";
-
-type AuthFormValues = {
-  username: string;
+type RegistrationFormValues = {
+  registrationCode: string;
   password: string;
   confirmPassword: string;
 };
 
-type AuthFormProps = {
-  mode: AuthMode;
-  onSubmit?: (values: LoginSchema) => Promise<void> | void;
+type RegistrationFormProps = {
+  onSubmit?: (values: RegisterSchema) => Promise<void> | void;
 };
 
-export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
+export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { t } = useTranslation(["auth", "common"]);
 
@@ -27,26 +24,18 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<AuthFormValues>({
+  } = useForm<RegistrationFormValues>({
     defaultValues: {
-      username: "",
+      registrationCode: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  const isRegister = mode === "register";
-
-  const submitLabel = isRegister ? t("auth:actions.submitRegister") : t("auth:actions.submitLogin");
-  const title = isRegister ? t("auth:title.register") : t("auth:title.login");
-  const subtitle = isRegister
-    ? t("auth:subtitle.register")
-    : t("auth:subtitle.login");
-
-  async function onFormSubmit(values: AuthFormValues) {
+  async function onFormSubmit(values: RegistrationFormValues) {
     setSubmitError(null);
 
-    if (isRegister && values.password !== values.confirmPassword) {
+    if (values.password !== values.confirmPassword) {
       setError("confirmPassword", {
         type: "validate",
         message: t("auth:validation.passwordsDoNotMatch"),
@@ -56,7 +45,7 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
 
     try {
       if (onSubmit) {
-        await onSubmit({ displayName: values.username, password: values.password });
+        await onSubmit({ registrationCode: values.registrationCode, password: values.password });
       } else {
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
@@ -71,9 +60,9 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
     <Box component="section">
       <Stack spacing={3}>
         <Stack spacing={1}>
-          <Typography variant="h5">{title}</Typography>
+          <Typography variant="h5">{t("auth:title.register")}</Typography>
           <Typography variant="body2" color="text.secondary">
-            {subtitle}
+            {t("auth:subtitle.register")}
           </Typography>
         </Stack>
 
@@ -81,23 +70,19 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
 
         <Stack component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
           <Controller
-            name="username"
+            name="registrationCode"
             control={control}
             rules={{
-              required: t("auth:validation.usernameRequired"),
-              minLength: {
-                value: 8,
-                message: t("auth:validation.usernameMinLength"),
-              },
+              required: t("auth:validation.registrationCodeRequired"),
             }}
             render={({ field }) => (
               <TextField
                 {...field}
-                label={t("auth:fields.username")}
+                label={t("auth:fields.registrationCode")}
                 type="text"
-                autoComplete="username"
-                error={!!errors.username}
-                helperText={errors.username?.message}
+                autoComplete="registration-code"
+                error={!!errors.registrationCode}
+                helperText={errors.registrationCode?.message}
                 fullWidth
               />
             )}
@@ -118,7 +103,7 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
                 {...field}
                 label={t("auth:fields.password")}
                 type="password"
-                autoComplete={isRegister ? "new-password" : "current-password"}
+                autoComplete="new-password"
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 fullWidth
@@ -126,41 +111,39 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
             )}
           />
 
-          {isRegister ? (
-            <Controller
-              name="confirmPassword"
-              control={control}
-              rules={{
-                required: t("auth:validation.confirmPasswordRequired"),
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label={t("auth:fields.confirmPassword")}
-                  type="password"
-                  autoComplete="new-password"
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword?.message}
-                  fullWidth
-                />
-              )}
-            />
-          ) : null}
+          <Controller
+            name="confirmPassword"
+            control={control}
+            rules={{
+              required: t("auth:validation.confirmPasswordRequired"),
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label={t("auth:fields.confirmPassword")}
+                type="password"
+                autoComplete="new-password"
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword?.message}
+                fullWidth
+              />
+            )}
+          />
 
           <Button type="submit" variant="contained" size="large" disabled={isSubmitting}>
-            {isSubmitting ? t("common:actions.submitting") : submitLabel}
+            {isSubmitting ? t("common:actions.submitting") : t("auth:actions.submitRegister")}
           </Button>
         </Stack>
 
         <Typography variant="body2" color="text.secondary">
-          {isRegister ? t("auth:prompts.alreadyHaveAccount") : t("auth:prompts.newHere")}
+          {t("auth:prompts.alreadyHaveAccount")}
           <Link
             component={RouterLink}
-            to={isRegister ? "/auth/login" : "/auth/register"}
+            to="/auth/login"
             underline="hover"
             sx={{ fontWeight: 600 }}
           >
-            {isRegister ? t("auth:actions.switchToLogin") : t("auth:actions.switchToRegister")}
+            {t("auth:actions.switchToLogin")}
           </Link>
         </Typography>
       </Stack>
