@@ -1,7 +1,7 @@
 ﻿using Domain.Auth.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Shared;
+namespace Infrastructure.Data;
 
 public class DatabaseSeeder
 {

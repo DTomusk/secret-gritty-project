@@ -1,31 +1,14 @@
 ﻿using Domain.Auth.Entities;
 using Domain.Auth.ValueObjects;
-using Domain.Shared.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Infrastructure.Shared;
+namespace Infrastructure.Auth.EF;
 
-public class AppDbContext : DbContext
+public static class Configuration
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    public static void ConfigureAuthContext(this ModelBuilder modelBuilder)
     {
-    }
-
-    public DbSet<User> Users => Set<User>();
-
-    public DbSet<UserRole> UserRoles => Set<UserRole>();
-
-    public DbSet<Role> Roles => Set<Role>();
-
-    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-
-    public DbSet<ProcessedEvent> ProcessedEvents => Set<ProcessedEvent>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
         // Configure UserRole entity
         modelBuilder.Entity<UserRole>(entity =>
         {
@@ -77,33 +60,6 @@ public class AppDbContext : DbContext
             entity.Property(e => e.RegistrationCode)
                 .IsRequired()
                 .HasConversion(registrationCodeConverter);
-        });
-
-        // Configure OutboxMessage entity
-        modelBuilder.Entity<OutboxMessage>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.EventType)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.Payload)
-                .IsRequired();
-            entity.Property(e => e.OccurredAt)
-                .IsRequired();
-            entity.HasIndex(e => new { e.ProcessedAt, e.OccurredAt });
-        });
-
-        // Configure ProcessedEvent entity
-        modelBuilder.Entity<ProcessedEvent>(entity =>
-        {
-            entity.HasKey(e => new { e.EventId, e.HandlerName });
-            entity.Property(e => e.EventId)
-                .IsRequired();
-            entity.Property(e => e.HandlerName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.ProcessedAt)
-                .IsRequired();
         });
     }
 }

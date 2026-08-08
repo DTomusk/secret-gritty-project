@@ -12,9 +12,10 @@ public class CalendarEventTests
         var name = "Test Event";
         var date = new DateOnly(2024, 6, 1);
         var eventType = CalendarEventType.BookClub;
+        var scheduledByUserId = Guid.NewGuid();
 
         // Act
-        var calendarEvent = CalendarEvent.Create(name, date, eventType);
+        var calendarEvent = CalendarEvent.Create(scheduledByUserId, name, date, eventType);
 
         // Assert
         Assert.NotEqual(Guid.Empty, calendarEvent.Id);
@@ -32,7 +33,9 @@ public class CalendarEventTests
         // Arrange
         var date = new DateOnly(2024, 6, 1);
         var eventType = CalendarEventType.BookClub;
+        var scheduledByUserId = Guid.NewGuid();
+
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CalendarEvent.Create(name, date, eventType));
+        Assert.Throws<ArgumentException>(() => CalendarEvent.Create(scheduledByUserId, name, date, eventType));
     }
 }

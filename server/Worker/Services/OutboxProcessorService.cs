@@ -1,4 +1,4 @@
-﻿using Infrastructure.Shared;
+﻿using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

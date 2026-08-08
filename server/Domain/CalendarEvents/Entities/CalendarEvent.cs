@@ -1,15 +1,19 @@
-﻿namespace Domain.CalendarEvents.Entities;
+﻿using Domain.Auth.Entities;
+
+namespace Domain.CalendarEvents.Entities;
 
 public class CalendarEvent
 {
     public Guid Id { get; init; }
+    public Guid ScheduledByUserId { get; init; }
     public string Name { get; private set; }
     public DateOnly Date { get; private set; }
     public CalendarEventType EventType { get; private set; }
+    public User ScheduledByUser { get; private set; }
 
     private CalendarEvent() { }
 
-    public static CalendarEvent Create(string name, DateOnly date, CalendarEventType eventType)
+    public static CalendarEvent Create(Guid scheduledByUserId, string name, DateOnly date, CalendarEventType eventType)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -19,6 +23,7 @@ public class CalendarEvent
         return new CalendarEvent
         {
             Id = Guid.NewGuid(),
+            ScheduledByUserId = scheduledByUserId,
             Name = name,
             Date = date,
             EventType = eventType

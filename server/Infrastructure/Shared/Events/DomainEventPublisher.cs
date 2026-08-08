@@ -1,5 +1,6 @@
 ﻿using Application.Shared.Interfaces;
 using Domain.Shared.Events;
+using Infrastructure.Data;
 using System.Text.Json;
 
 namespace Infrastructure.Shared.Events;

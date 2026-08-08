@@ -1,7 +1,7 @@
 using Api.IoC;
 using Application.IoC;
+using Infrastructure.Data;
 using Infrastructure.IoC;
-using Infrastructure.Shared;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
