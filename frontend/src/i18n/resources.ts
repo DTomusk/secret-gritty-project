@@ -2,5 +2,52 @@ export const defaultNS = 'common';
 export const fallbackLng = 'en';
 
 export const resources = {
-  en: {}
+  en: {
+    common: {
+      actions: {
+        submitting: 'Submitting...',
+        submit: 'Submit',
+        confirm: 'Confirm',
+      },
+      errors: {
+        genericSubmit: 'Something went wrong. Please try again.',
+      },
+      loading: 'Loading...',
+      error: 'Error',
+    },
+    auth: {
+      title: {
+        login: 'Yo, whaddup😎',
+        register: 'Howdy 🤠💅',
+      },
+      subtitle: {
+        login: 'Sign in now to make your dreams come ✨true✨',
+        register: 'Enter your registration code below and choose a password to start your gritty journey',
+      },
+      fields: {
+        username: 'Username',
+        password: 'Password',
+        confirmPassword: 'Confirm password',
+        registrationCode: 'Registration code',
+      },
+      actions: {
+        submitLogin: 'Sign in',
+        submitRegister: 'Create account',
+        switchToLogin: 'Sign in',
+        switchToRegister: 'Why not make one?',
+      },
+      prompts: {
+        alreadyHaveAccount: 'Already have an account? ',
+        newHere: 'Don\'t have an account?👀 ',
+      },
+      validation: {
+        usernameRequired: 'Username is required.',
+        usernameMinLength: 'Username must be at least 8 characters.',
+        passwordRequired: 'Password is required.',
+        passwordMinLength: 'Password must be at least 8 characters.',
+        confirmPasswordRequired: 'Please confirm your password.',
+        passwordsDoNotMatch: 'Passwords do not match.',
+      },
+    },
+  }
 } as const;
