@@ -5,23 +5,35 @@ using Api.Shared.RateLimiting;
 using Application.Auth.Interfaces;
 using Application.CalendarEvents.Commands;
 using Application.CalendarEvents.DTOs;
+using Application.CalendarEvents.Queries;
 using Application.Shared.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Api.CalendarEvents.Controllers;
 
-[Route("[controller]")]
+[Route("Events")]
 [ApiController]
 [EnableRateLimiting(RateLimitingConfiguration.AuthenticatedPolicy)]
 public class CalendarEventsController : AuthenticatedControllerBase
 {
     private readonly ICommandHandler<ScheduleEventCommand, ScheduleEventResponse> _scheduleEventCommandHandler;
+    private readonly IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?> _upcomingEventQueryHandler;
 
     public CalendarEventsController(ICommandHandler<ScheduleEventCommand, ScheduleEventResponse> scheduleEventCommandHandler,
+        IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?> upcomingEventQueryHandler,
         ICurrentUserService currentUserService) : base(currentUserService)
     {
         _scheduleEventCommandHandler = scheduleEventCommandHandler;
+        _upcomingEventQueryHandler = upcomingEventQueryHandler;
+    }
+
+    [HttpGet("Next", Name = "GetUpcomingEvent")]
+    public async Task<IActionResult> GetUpcomingEvent()
+    {
+        var query = new UpcomingEventQuery();
+        var upcomingEvent = await _upcomingEventQueryHandler.HandleAsync(query);
+        return upcomingEvent is null ? NoContent() : Ok(upcomingEvent);
     }
 
     [HttpPost(Name = "ScheduleEvent")]

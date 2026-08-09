@@ -4,6 +4,7 @@ using Application.Auth.Handlers;
 using Application.CalendarEvents.Commands;
 using Application.CalendarEvents.DTOs;
 using Application.CalendarEvents.Handlers;
+using Application.CalendarEvents.Queries;
 using Application.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +22,7 @@ public static class Register
 
         // CalendarEvent handlers
         services.AddScoped<ICommandHandler<ScheduleEventCommand, ScheduleEventResponse>, ScheduleEventCommandHandler>();
+        services.AddScoped<IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?>, UpcomingEventQueryHandler>();
         return services;
     }
 
