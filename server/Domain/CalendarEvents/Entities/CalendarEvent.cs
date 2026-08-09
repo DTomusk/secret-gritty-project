@@ -30,5 +30,5 @@ public class CalendarEvent
 
 public enum CalendarEventType
 {
-    BookClub
+    BookClub = 1
 }
