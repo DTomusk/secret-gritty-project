@@ -7,11 +7,13 @@ using Application.CalendarEvents.Commands;
 using Application.CalendarEvents.DTOs;
 using Application.CalendarEvents.Queries;
 using Application.Shared.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Api.CalendarEvents.Controllers;
 
+[Authorize]
 [Route("Events")]
 [ApiController]
 [EnableRateLimiting(RateLimitingConfiguration.AuthenticatedPolicy)]

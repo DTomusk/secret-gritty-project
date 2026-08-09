@@ -21,16 +21,17 @@ public class CalendarEventQueryService : ICalendarEventQueryService
                 _context.Users,
                 calendarEvent => calendarEvent.ScheduledByUserId,
                 user => user.Id,
-                (calendarEvent, user) => new UpcomingEventResponse(
-                    calendarEvent.Name,
-                    calendarEvent.Date,
-                    calendarEvent.EventType,
-                    user.UserName
-                    )
-             )
-            .Where(e => e.Date > DateOnly.FromDateTime(DateTime.UtcNow))
+                (calendarEvent, user) => new { calendarEvent, user }
+            )
+            .Where(x => x.calendarEvent.Date > DateOnly.FromDateTime(DateTime.UtcNow))
             // Order by ascending date
-            .OrderBy(e => e.Date)
+            .OrderBy(x => x.calendarEvent.Date)
+            .Select(x => new UpcomingEventResponse(
+                x.calendarEvent.Name,
+                x.calendarEvent.Date,
+                x.calendarEvent.EventType,
+                x.user.UserName
+            ))
             .FirstOrDefaultAsync();
     }
 }
