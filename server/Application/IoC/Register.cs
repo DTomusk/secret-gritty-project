@@ -23,6 +23,7 @@ public static class Register
         // CalendarEvent handlers
         services.AddScoped<ICommandHandler<ScheduleEventCommand, ScheduleEventResponse>, ScheduleEventCommandHandler>();
         services.AddScoped<IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?>, UpcomingEventQueryHandler>();
+        services.AddScoped<IQueryHandler<EventByIdQuery, EventDetailResponse?>, EventByIdQueryHandler>();
         return services;
     }
 

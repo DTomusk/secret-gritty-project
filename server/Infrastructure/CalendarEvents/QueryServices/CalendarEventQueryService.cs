@@ -27,6 +27,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
             // Order by ascending date
             .OrderBy(x => x.calendarEvent.Date)
             .Select(x => new UpcomingEventResponse(
+                x.calendarEvent.Id,
                 x.calendarEvent.Name,
                 x.calendarEvent.Date,
                 x.calendarEvent.EventType,

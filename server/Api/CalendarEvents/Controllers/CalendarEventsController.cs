@@ -21,13 +21,16 @@ public class CalendarEventsController : AuthenticatedControllerBase
 {
     private readonly ICommandHandler<ScheduleEventCommand, ScheduleEventResponse> _scheduleEventCommandHandler;
     private readonly IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?> _upcomingEventQueryHandler;
+    private readonly IQueryHandler<EventByIdQuery, EventDetailResponse?> _eventByIdQueryHandler;
 
     public CalendarEventsController(ICommandHandler<ScheduleEventCommand, ScheduleEventResponse> scheduleEventCommandHandler,
         IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?> upcomingEventQueryHandler,
+        IQueryHandler<EventByIdQuery, EventDetailResponse?> eventByIdQueryHandler,
         ICurrentUserService currentUserService) : base(currentUserService)
     {
         _scheduleEventCommandHandler = scheduleEventCommandHandler;
         _upcomingEventQueryHandler = upcomingEventQueryHandler;
+        _eventByIdQueryHandler = eventByIdQueryHandler;
     }
 
     [HttpGet("Next", Name = "GetUpcomingEvent")]
@@ -42,6 +45,8 @@ public class CalendarEventsController : AuthenticatedControllerBase
     public async Task<IActionResult> GetEventById(Guid id)
     {
         var query = new EventByIdQuery(id);
+        var eventDetail = await _eventByIdQueryHandler.HandleAsync(query);
+        return eventDetail is null ? NotFound() : Ok(eventDetail);
     }
 
     [HttpPost(Name = "ScheduleEvent")]

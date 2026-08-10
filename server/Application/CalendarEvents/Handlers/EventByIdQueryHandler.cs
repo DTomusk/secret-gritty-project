@@ -5,7 +5,7 @@ using Application.Shared.Interfaces;
 
 namespace Application.CalendarEvents.Handlers;
 
-public class EventByIdQueryHandler : IQueryHandler<EventByIdQuery, EventDetailResponse>
+public class EventByIdQueryHandler : IQueryHandler<EventByIdQuery, EventDetailResponse?>
 {
     private readonly ICalendarEventQueryService _queryService;
 
@@ -14,8 +14,8 @@ public class EventByIdQueryHandler : IQueryHandler<EventByIdQuery, EventDetailRe
         _queryService = queryService;
     }
 
-    public Task<EventDetailResponse> HandleAsync(EventByIdQuery query, CancellationToken cancellationToken = default)
+    public async Task<EventDetailResponse?> HandleAsync(EventByIdQuery query, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _queryService.GetEventByIdAsync(query.Id, cancellationToken);
     }
 }

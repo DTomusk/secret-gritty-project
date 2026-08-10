@@ -2,4 +2,4 @@
 
 namespace Application.CalendarEvents.DTOs;
 
-public record UpcomingEventResponse(string Name, DateOnly Date, CalendarEventType EventType, string ScheduledByUserName);
+public record UpcomingEventResponse(Guid Id, string Name, DateOnly Date, CalendarEventType EventType, string ScheduledByUserName);
