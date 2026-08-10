@@ -5,6 +5,9 @@ import HomePage from '../pages/HomePage'
 import AppLayout from '../layout/AppLayout'
 import { createBrowserRouter } from 'react-router-dom'
 import ProtectedLayout from './ProtectedLayout'
+import EventsPage from '../pages/EventsPage'
+import EventDetailPage from '../pages/EventDetailPage'
+import EventCreatePage from '../pages/EventCreatePage'
 
 export const router = createBrowserRouter([
     {
@@ -18,6 +21,20 @@ export const router = createBrowserRouter([
                         index: true,
                         element: <HomePage />
                     },
+                    {
+                        path: 'events',
+                        element: <EventsPage />,
+                        children: [
+                            {
+                                path: 'create',
+                                element: <EventCreatePage />
+                            },
+                            {
+                                path: ':id',
+                                element: <EventDetailPage />
+                            }
+                        ]
+                    }
                 ]
             }
         ]
