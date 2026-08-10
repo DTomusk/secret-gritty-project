@@ -38,6 +38,12 @@ public class CalendarEventsController : AuthenticatedControllerBase
         return upcomingEvent is null ? NoContent() : Ok(upcomingEvent);
     }
 
+    [HttpGet("{id:guid}", Name = "GetEventById")]
+    public async Task<IActionResult> GetEventById(Guid id)
+    {
+        var query = new EventByIdQuery(id);
+    }
+
     [HttpPost(Name = "ScheduleEvent")]
     public async Task<IActionResult> ScheduleEvent([FromBody] ScheduleEventRequest request)
     {
