@@ -1,4 +1,5 @@
 import AuthLayout from '../layout/AuthLayout'
+import NotFoundPage from '../pages/NotFoundPage'
 import LoginPage from '../pages/LoginPage'
 import RegistrationPage from '../pages/RegistrationPage'
 import HomePage from '../pages/HomePage'
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
                                 element: <EventDetailPage />
                             }
                         ]
+                    },
+                    {
+                        path: '*',
+                        element: <NotFoundPage />
                     }
                 ]
             }
