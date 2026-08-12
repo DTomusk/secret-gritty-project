@@ -23,8 +23,11 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'events',
-                        element: <EventsPage />,
                         children: [
+                            {
+                                index: true,
+                                element: <EventsPage />
+                            },
                             {
                                 path: 'create',
                                 element: <EventCreatePage />

@@ -12,3 +12,10 @@ export type UpcomingEventResponse = {
     eventType: number;
     scheduledByUserName: string;
 }
+
+export type EventDetailResponse = {
+    name: string;
+    date: string; 
+    eventType: number;
+    scheduledByUserName: string;
+}
