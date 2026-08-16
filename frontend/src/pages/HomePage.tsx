@@ -18,7 +18,7 @@ export default function HomePage() {
             {isLoading && <Spinner />}
             {error && <Alert severity="error">Failed to load upcoming event</Alert>}
             {data && (
-                <Stack spacing={2}>
+                <Stack spacing={3}>
                     <Typography variant="h3">It's {daysUntil(data.date)} days until {data.name}</Typography>
                     <Button variant="contained" 
                             onClick={() => navigate(`/events/${data.id}`)}
