@@ -47,4 +47,10 @@ public class UserRepository : IUserRepository
             .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.RegistrationCode == registrationCode, cancellationToken);
     }
+
+    public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .ToListAsync(cancellationToken);
+    }
 }

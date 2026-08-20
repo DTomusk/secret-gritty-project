@@ -20,16 +20,22 @@ namespace Api.CalendarEvents.Controllers;
 public class CalendarEventsController : AuthenticatedControllerBase
 {
     private readonly ICommandHandler<ScheduleEventCommand, ScheduleEventResponse> _scheduleEventCommandHandler;
+    private readonly ICommandHandler<ChooseNextHostCommand> _chooseNextHostCommandHandler;
     private readonly IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?> _upcomingEventQueryHandler;
+    private readonly IQueryHandler<UpcomingBookClubQuery, UpcomingEventResponse?> _upcomingBookClubQueryHandler;
     private readonly IQueryHandler<EventByIdQuery, EventDetailResponse?> _eventByIdQueryHandler;
 
     public CalendarEventsController(ICommandHandler<ScheduleEventCommand, ScheduleEventResponse> scheduleEventCommandHandler,
+        ICommandHandler<ChooseNextHostCommand> chooseNextHostCommandHandler,
         IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?> upcomingEventQueryHandler,
+        IQueryHandler<UpcomingBookClubQuery, UpcomingEventResponse?> upcomingBookClubQueryHandler,
         IQueryHandler<EventByIdQuery, EventDetailResponse?> eventByIdQueryHandler,
         ICurrentUserService currentUserService) : base(currentUserService)
     {
         _scheduleEventCommandHandler = scheduleEventCommandHandler;
+        _chooseNextHostCommandHandler = chooseNextHostCommandHandler;
         _upcomingEventQueryHandler = upcomingEventQueryHandler;
+        _upcomingBookClubQueryHandler = upcomingBookClubQueryHandler;
         _eventByIdQueryHandler = eventByIdQueryHandler;
     }
 
@@ -39,6 +45,27 @@ public class CalendarEventsController : AuthenticatedControllerBase
         var query = new UpcomingEventQuery();
         var upcomingEvent = await _upcomingEventQueryHandler.HandleAsync(query);
         return upcomingEvent is null ? NoContent() : Ok(upcomingEvent);
+    }
+
+    [HttpGet("Next/BookClub", Name = "GetUpcomingBookClubEvent")]
+    public async Task<IActionResult> GetUpcomingBookClubEvent()
+    {
+        var query = new UpcomingBookClubQuery();
+        var upcomingEvent = await _upcomingBookClubQueryHandler.HandleAsync(query);
+        return upcomingEvent is null ? NoContent() : Ok(upcomingEvent);
+    }
+
+    [HttpPost("Next/BookClub/Host", Name = "ScheduleBookClubEvent")]
+    public async Task<IActionResult> ScheduleBookClubEvent([FromBody] ChooseNextHostRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var command = new ChooseNextHostCommand(request.HostId);
+
+        var result = await _chooseNextHostCommandHandler.HandleAsync(command);
+
+        return result.ToActionResult();
     }
 
     [HttpGet("{id:guid}", Name = "GetEventById")]

@@ -2,6 +2,7 @@
 
 namespace Domain.Auth.Entities;
 
+// TODO: this crosses bounded contexts, consider having a separate User entity
 public class User
 {
     private string _userName = string.Empty;

@@ -5,6 +5,9 @@ using Application.CalendarEvents.Commands;
 using Application.CalendarEvents.DTOs;
 using Application.CalendarEvents.Handlers;
 using Application.CalendarEvents.Queries;
+using Application.Members.DTOs;
+using Application.Members.Handlers;
+using Application.Members.Queries;
 using Application.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,8 +25,14 @@ public static class Register
 
         // CalendarEvent handlers
         services.AddScoped<ICommandHandler<ScheduleEventCommand, ScheduleEventResponse>, ScheduleEventCommandHandler>();
+        services.AddScoped<ICommandHandler<ChooseNextHostCommand>, ChooseNextHostCommandHandler>();
         services.AddScoped<IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?>, UpcomingEventQueryHandler>();
+        services.AddScoped<IQueryHandler<UpcomingBookClubQuery, UpcomingEventResponse?>, UpcomingBookClubQueryHandler>();
         services.AddScoped<IQueryHandler<EventByIdQuery, EventDetailResponse?>, EventByIdQueryHandler>();
+
+        // Members handlers
+        services.AddScoped<IQueryHandler<GetMembersQuery, IEnumerable<MemberDTO>>, GetMembersQueryHandler>();
+
         return services;
     }
 

@@ -17,4 +17,20 @@ public class CalendarEventRespository : ICalendarEventRepository
     {
         _context.CalendarEvents.Add(calendarEvent);
     }
+
+    public async Task<CalendarEvent?> GetFutureEventByType(CalendarEventType eventType, CancellationToken cancellationToken = default)
+    {
+        return _context.CalendarEvents
+            .Where(e => e.EventType == eventType && e.Date.HasValue && e.Date > DateOnly.FromDateTime(DateTime.UtcNow))
+            .OrderBy(e => e.Date)
+            .FirstOrDefault();
+    }
+
+    public async Task<CalendarEvent?> GetUnscheduledEventByType(CalendarEventType eventType, CancellationToken cancellationToken = default)
+    {
+        return _context.CalendarEvents
+            .Where(e => e.EventType == eventType && !e.Date.HasValue)
+            .OrderBy(e => e.Date)
+            .FirstOrDefault();
+    }
 }
