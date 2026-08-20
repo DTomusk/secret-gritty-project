@@ -5,6 +5,10 @@ export type ScheduleEventRequest = {
     eventType: number;
 }
 
+export type ScheduleEventResponse = {
+    eventId: string;
+}
+
 export type UpcomingEventResponse = {
     id: string;
     name: string;

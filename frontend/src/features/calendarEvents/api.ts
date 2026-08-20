@@ -1,5 +1,5 @@
 import { api } from "../../lib/api/api"
-import type { EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types"
+import type { EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse, ScheduleEventResponse } from "./types"
 
 export const getUpcomingEvent = async () => {
     return api.get<UpcomingEventResponse>("/Events/Next")
@@ -10,6 +10,6 @@ export const getEventById = async (eventId: string) => {
 }
 
 export const scheduleEvent = async (input: ScheduleEventRequest) => {
-    return api.post("/Events", JSON.stringify(input));
+    return api.post<ScheduleEventResponse>("/Events", JSON.stringify(input));
 }
 

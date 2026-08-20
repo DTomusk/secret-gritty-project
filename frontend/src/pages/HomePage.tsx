@@ -17,7 +17,7 @@ export default function HomePage() {
             </Typography>
             {isLoading && <Spinner />}
             {error && <Alert severity="error">Failed to load upcoming event</Alert>}
-            {data && (
+            {data && !error && (
                 <Stack spacing={3}>
                     <Typography variant="h3">It's {daysUntil(data.date)} days until {data.name}</Typography>
                     <Button variant="contained" 

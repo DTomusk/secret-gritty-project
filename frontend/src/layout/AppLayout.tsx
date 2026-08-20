@@ -25,7 +25,7 @@ export default function AppLayout() {
                     // justifyContent: 'center',
                     width: {xs: "100%", sm: "80%", md: "60%", lg: "50%"},
                     px: 2,
-                    py: 4,
+                    py: 2,
                     background: (theme) =>
                         `linear-gradient(135deg, ${theme.palette.primary.light}1f 0%, ${theme.palette.background.default} 45%, ${theme.palette.secondary.light}1a 100%)`,
                 }}
