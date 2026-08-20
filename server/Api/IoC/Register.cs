@@ -1,4 +1,5 @@
 ﻿using Api.Auth.Validators;
+using Api.CalendarEvents.Validators;
 using Api.Shared.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -19,6 +20,8 @@ public static class Register
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<RegisterUserRequestValidator>();
         services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+
+        services.AddValidatorsFromAssemblyContaining<ScheduleEventRequestValidator>();
 
         // JWT auth
         var jwtOptions = configuration.GetSection("JwtOptions");
@@ -48,6 +51,7 @@ public static class Register
         // Rate limiting
         services.AddRateLimiter(options => options.ConfigureRateLimiting(configuration));
 
+        // Auth infrastructure services added here as only relevant to API, not Worker
         services.AddAuthInfrastructureServices(configuration);
 
         return services;

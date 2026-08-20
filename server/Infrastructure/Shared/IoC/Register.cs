@@ -1,4 +1,5 @@
 ﻿using Application.Shared.Interfaces;
+using Infrastructure.Data;
 using Infrastructure.Shared.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

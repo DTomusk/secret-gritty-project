@@ -1,6 +1,6 @@
 ﻿using Application.Shared.Interfaces;
 using Domain.Shared.Events;
-using Infrastructure.Shared;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Worker.Services;

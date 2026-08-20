@@ -7,7 +7,7 @@ export default function NavBar() {
     const navigate = useNavigate();
 
     return (
-        <AppBar position="sticky" sx={{ top: 0 }} color="secondary">
+        <AppBar position="sticky" sx={{ top: 0 }} color="primary">
             <Toolbar>
                 {isAuthenticated ? (
                     <>

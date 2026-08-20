@@ -1,4 +1,5 @@
-﻿using Infrastructure.Shared.IoC;
+﻿using Infrastructure.CalendarEvents.IoC;
+using Infrastructure.Shared.IoC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,6 +9,7 @@ public static class Register
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddCalendarEventInfrastructureServices();
         services.AddSharedInfrastructureServices(configuration);
 
         return services;

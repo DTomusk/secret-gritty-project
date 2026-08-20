@@ -1,7 +1,7 @@
 ﻿using Application.Auth.Interfaces;
 using Domain.Auth.Entities;
 using Domain.Auth.ValueObjects;
-using Infrastructure.Shared;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Auth.Repositories;

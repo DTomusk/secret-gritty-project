@@ -1,6 +1,6 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
-export const appTheme = createTheme({
+export const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -20,22 +20,27 @@ export const appTheme = createTheme({
   typography: {
     fontFamily: '"Plus Jakarta Sans", "Segoe UI", sans-serif',
     h1: {
+      fontSize: '3rem',
       fontWeight: 700,
       letterSpacing: '-0.02em',
     },
     h2: {
+      fontSize: '2.25rem',
       fontWeight: 700,
       letterSpacing: '-0.02em',
     },
     h3: {
+      fontSize: '1.75rem',
       fontWeight: 700,
       letterSpacing: '-0.02em',
     },
     h4: {
+      fontSize: '1.5rem',
       fontWeight: 700,
       letterSpacing: '-0.01em',
     },
     h5: {
+      fontSize: '1.25rem',
       fontWeight: 700,
     },
     button: {
@@ -58,3 +63,5 @@ export const appTheme = createTheme({
     },
   },
 });
+
+export const appTheme = responsiveFontSizes(theme);
