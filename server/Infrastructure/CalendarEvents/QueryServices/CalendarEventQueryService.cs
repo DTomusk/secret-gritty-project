@@ -19,7 +19,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
         return await _context.CalendarEvents
             .Join(
                 _context.Users,
-                calendarEvent => calendarEvent.ScheduledByUserId,
+                calendarEvent => calendarEvent.HostUserId,
                 user => user.Id,
                 (calendarEvent, user) => new { calendarEvent, user }
             )
@@ -41,7 +41,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
         return await _context.CalendarEvents
            .Join(
                _context.Users,
-               calendarEvent => calendarEvent.ScheduledByUserId,
+               calendarEvent => calendarEvent.HostUserId,
                user => user.Id,
                (calendarEvent, user) => new { calendarEvent, user }
            )

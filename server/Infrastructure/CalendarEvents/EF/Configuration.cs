@@ -13,11 +13,11 @@ public static class Configuration
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.Date).IsRequired();
+            entity.Property(e => e.Date).IsRequired(false);
             entity.Property(e => e.EventType).IsRequired();
             entity.HasOne<User>()
                 .WithMany()
-                .HasForeignKey(e => e.ScheduledByUserId)
+                .HasForeignKey(e => e.HostUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

@@ -22,7 +22,7 @@ public class ScheduleEventCommandHandler : ICommandHandler<ScheduleEventCommand,
     {
         // User id determined from current user in controller
         // Name and date already checked in fluent validation
-        var calendarEvent = CalendarEvent.Create(command.UserId, command.Name, command.Date, command.EventType);
+        var calendarEvent = CalendarEvent.CreateScheduledEvent(command.UserId, command.Name, command.Date, command.EventType);
         await _repo.CreateAsync(calendarEvent, cancellationToken);
         await _unitOfWork.CommitAsync(cancellationToken);
         return Result<ScheduleEventResponse>.Success(new ScheduleEventResponse(calendarEvent.Id));
