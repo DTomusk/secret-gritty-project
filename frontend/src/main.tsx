@@ -11,7 +11,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 initApiClient(import.meta.env.VITE_API_BASE_URL);
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

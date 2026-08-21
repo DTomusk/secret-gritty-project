@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types";
-import { getEventById, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
+import type { ChooseNextHostRequest, EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types";
+import { chooseNextHost, getEventById, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
 
 export function useUpcomingEvent() {
     return useQuery<UpcomingEventResponse>({
@@ -36,6 +36,15 @@ export function useScheduleEvent() {
     return useMutation({
         mutationFn: async (input: ScheduleEventRequest) => {
             const response = await scheduleEvent(input);
+            return response;
+        }
+    });
+}
+
+export function useChooseNextHost() {
+    return useMutation({
+        mutationFn: async (input: ChooseNextHostRequest) => {
+            const response = await chooseNextHost(input);
             return response;
         }
     });

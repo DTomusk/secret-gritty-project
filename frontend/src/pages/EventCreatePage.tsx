@@ -1,5 +1,6 @@
 import { Alert, Box, Button, Stack, TextField, Typography } from "@mui/material";
 import BackLink from "../components/BackLink";
+import FormWrapper from "../components/FormWrapper";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
@@ -67,7 +68,7 @@ export default function EventCreatePage() {
 
                     {submitError ? <Alert severity="error">{submitError}</Alert> : null}
 
-                    <Stack component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
+                    <FormWrapper component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
                         <Controller
                             name="name"
                             control={control}
@@ -113,7 +114,7 @@ export default function EventCreatePage() {
                         >
                             Schedule event
                         </Button>
-                    </Stack>
+                    </FormWrapper>
                 </Stack>
             </Box>
         </Stack>

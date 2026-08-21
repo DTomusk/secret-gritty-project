@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router-dom";
+import FormWrapper from "../../../components/FormWrapper";
 import type { LoginSchema } from "../schemas/loginSchema";
 
 type LoginFormValues = {
@@ -57,7 +58,7 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
 
         {submitError ? <Alert severity="error">{submitError}</Alert> : null}
 
-        <Stack component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
+        <FormWrapper component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
           <Controller
             name="username"
             control={control}
@@ -103,7 +104,7 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
           <Button type="submit" variant="contained" size="large" disabled={isSubmitting}>
             {isSubmitting ? t("common:actions.submitting") : t("auth:actions.submitLogin")}
           </Button>
-        </Stack>
+        </FormWrapper>
 
         <Typography variant="body2" color="text.secondary">
           {t("auth:prompts.newHere")}

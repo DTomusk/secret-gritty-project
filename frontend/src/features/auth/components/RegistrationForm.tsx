@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router-dom";
+import FormWrapper from "../../../components/FormWrapper";
 import type { RegisterSchema } from "../schemas/registerSchema";
 
 type RegistrationFormValues = {
@@ -68,7 +69,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
 
         {submitError ? <Alert severity="error">{submitError}</Alert> : null}
 
-        <Stack component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
+        <FormWrapper component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
           <Controller
             name="registrationCode"
             control={control}
@@ -133,7 +134,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
           <Button type="submit" variant="contained" size="large" disabled={isSubmitting}>
             {isSubmitting ? t("common:actions.submitting") : t("auth:actions.submitRegister")}
           </Button>
-        </Stack>
+        </FormWrapper>
 
         <Typography variant="body2" color="text.secondary">
           {t("auth:prompts.alreadyHaveAccount")}

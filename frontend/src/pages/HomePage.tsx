@@ -18,15 +18,25 @@ export default function HomePage() {
             </Typography>
             {isLoading && <Spinner />}
             {error && <Alert severity="error">Failed to load upcoming event</Alert>}
-            {nextBookClub && !error && (
+            {nextBookClub && nextBookClub.date && !error && (
                 <UpcomingBookClubSection bookClub={nextBookClub} />
+            )}
+            {nextBookClub && !nextBookClub.date && !error && (
+                <Stack spacing={2} sx={{ mt: 2, justifyContent: 'center', alignItems: 'center' }}>
+                <Typography variant="h5">
+                    {nextBookClub.hostUserName} is hosting the next book club.
+                </Typography>
+                <Typography variant="body1">
+                    {nextBookClub.hostUserName} hasn't chosen a date yet, stay tuned!
+                </Typography>
+                </Stack>
             )}
             {!nextBookClub && !isLoading && !error && (
                 <NoBookClubScheduledSection />
             )}
-            <Button variant="outlined" onClick={() => navigate("/events/create")}>
+            {/* <Button variant="outlined" onClick={() => navigate("/events/create")}>
                 Schedule an event
-            </Button>
+            </Button> */}
         </Stack>
     );
 }

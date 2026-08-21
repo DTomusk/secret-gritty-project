@@ -1,6 +1,7 @@
 import { Stack, Typography, FormControl, InputLabel, Select, MenuItem, Alert, Button } from "@mui/material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import FormWrapper from "../../../components/FormWrapper";
 
 type MemberSelectFormValues = {
     memberId: string;
@@ -41,7 +42,7 @@ export default function MemberSelectForm({ title, subtitle, members, onSubmit }:
             {title && <Typography variant="h5">{title}</Typography>}
             {subtitle && <Typography variant="body2">{subtitle}</Typography>}
             {submitError ? <Alert severity="error">{submitError}</Alert> : null}
-            <Stack component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
+            <FormWrapper component="form" spacing={2} onSubmit={handleSubmit(onFormSubmit)} noValidate>
                 <Controller
                     name="memberId"
                     control={control}
@@ -69,7 +70,7 @@ export default function MemberSelectForm({ title, subtitle, members, onSubmit }:
                 <Button type="submit" variant="contained" size="large" disabled={isSubmitting}>
                     {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
-            </Stack>
+            </FormWrapper>
         </Stack>
     );
 }

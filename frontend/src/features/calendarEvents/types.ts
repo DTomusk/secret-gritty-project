@@ -14,12 +14,16 @@ export type UpcomingEventResponse = {
     name: string;
     date: string; 
     eventType: number;
-    scheduledByUserName: string;
+    hostUserName: string;
 }
 
 export type EventDetailResponse = {
     name: string;
     date: string; 
     eventType: number;
-    scheduledByUserName: string;
+    hostUserName: string;
+}
+
+export type ChooseNextHostRequest = {
+    hostId: string;
 }
