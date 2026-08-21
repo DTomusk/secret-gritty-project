@@ -1,13 +1,14 @@
 import { Alert, Button, Stack, Typography } from "@mui/material";
 import Spinner from "../components/Spinner";
+import { NoBookClubScheduledSection } from "../features/auth/components/sections/NoBookClubScheduledSection";
 import { getUsername } from "../lib/auth/token";
-import { useUpcomingEvent } from "../features/calendarEvents/hooks";
-import { daysUntil } from "../lib/utils/dateConverter";
+import { useUpcomingBookClub } from "../features/calendarEvents/hooks";
 import { useNavigate } from "react-router-dom";
+import { UpcomingBookClubSection } from "../features/calendarEvents/components/UpcomingBookClubSection";
 
 export default function HomePage() {
     const username = getUsername();
-    const { data, isLoading, error } = useUpcomingEvent();
+    const { data: nextBookClub, isLoading, error } = useUpcomingBookClub();
     const navigate = useNavigate();
 
     return (
@@ -17,19 +18,11 @@ export default function HomePage() {
             </Typography>
             {isLoading && <Spinner />}
             {error && <Alert severity="error">Failed to load upcoming event</Alert>}
-            {data && !error && (
-                <Stack spacing={3}>
-                    <Typography variant="h3">It's {daysUntil(data.date)} days until {data.name}</Typography>
-                    <Button variant="contained" 
-                            onClick={() => navigate(`/events/${data.id}`)}
-                            sx={{ mt: 2, alignSelf: 'center' }}
-                    >
-                        View event details
-                    </Button>
-                </Stack>
+            {nextBookClub && !error && (
+                <UpcomingBookClubSection bookClub={nextBookClub} />
             )}
-            {!data && !isLoading && !error && (
-                <Typography>No upcoming events</Typography>
+            {!nextBookClub && !isLoading && !error && (
+                <NoBookClubScheduledSection />
             )}
             <Button variant="outlined" onClick={() => navigate("/events/create")}>
                 Schedule an event

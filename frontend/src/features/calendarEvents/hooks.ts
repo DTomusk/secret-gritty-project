@@ -1,12 +1,22 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types";
-import { getEventById, getUpcomingEvent, scheduleEvent } from "./api";
+import { getEventById, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
 
 export function useUpcomingEvent() {
     return useQuery<UpcomingEventResponse>({
         queryKey: ["events", "upcoming"],
         queryFn: async () => {
             const response = await getUpcomingEvent();
+            return response;
+        }
+    })
+}
+
+export function useUpcomingBookClub() {
+    return useQuery<UpcomingEventResponse>({
+        queryKey: ["events", "upcoming", "bookclub"],
+        queryFn: async () => {
+            const response = await getUpcomingBookClub();
             return response;
         }
     })
