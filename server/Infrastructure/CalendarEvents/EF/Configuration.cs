@@ -20,5 +20,18 @@ public static class Configuration
                 .HasForeignKey(e => e.HostUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        modelBuilder.Entity<Poll>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Type).IsRequired();
+            entity.Property(e => e.ClosesAt).IsRequired();
+
+            entity.HasOne<CalendarEvent>()
+                .WithMany()
+                .HasForeignKey(e => e.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

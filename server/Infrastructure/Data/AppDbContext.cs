@@ -22,6 +22,8 @@ public class AppDbContext : DbContext
 
     #region calendar events
     public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
+
+    public DbSet<Poll> Polls => Set<Poll>();
     #endregion
 
     #region events
