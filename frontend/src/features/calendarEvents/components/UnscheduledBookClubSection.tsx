@@ -6,6 +6,7 @@ type UnscheduledBookClubSectionProps = {
 };
 
 export default function UnscheduledBookClubSection({ nextBookClub }: UnscheduledBookClubSectionProps) {
+    // We need to check if there are polls for this event or not
     return (
         <Stack spacing={2} sx={{ mt: 2, justifyContent: 'center', alignItems: 'center' }}>
             {nextBookClub.currentUserIsHost ? (
