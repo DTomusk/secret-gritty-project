@@ -21,11 +21,11 @@ public class UpcomingBookClubQueryHandler : IQueryHandler<UpcomingBookClubQuery,
         // These is an upcoming book club event, but there is no date, so, unless you're the host, you have to wait 
         // There is an upcoming book club event with a date
         // Note: there can only ever be one upcoming book club event
-        var upcomingEvent = await _calendarEventQueryService.GetUpcomingBookClubEventAsync(cancellationToken);
+        var upcomingEvent = await _calendarEventQueryService.GetUpcomingBookClubEventAsync(query.UserId, cancellationToken);
         if (upcomingEvent != null)
             return upcomingEvent;
 
-        var unscheduledEvent = await _calendarEventQueryService.GetUnscheduledBookClubEventAsync(cancellationToken);
+        var unscheduledEvent = await _calendarEventQueryService.GetUnscheduledBookClubEventAsync(query.UserId, cancellationToken);
         if (unscheduledEvent != null)
             return unscheduledEvent;
 

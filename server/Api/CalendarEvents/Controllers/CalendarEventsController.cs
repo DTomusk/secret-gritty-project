@@ -42,7 +42,7 @@ public class CalendarEventsController : AuthenticatedControllerBase
     [HttpGet("Next", Name = "GetUpcomingEvent")]
     public async Task<IActionResult> GetUpcomingEvent()
     {
-        var query = new UpcomingEventQuery();
+        var query = new UpcomingEventQuery(CurrentUserId);
         var upcomingEvent = await _upcomingEventQueryHandler.HandleAsync(query);
         return upcomingEvent is null ? NoContent() : Ok(upcomingEvent);
     }
@@ -50,7 +50,7 @@ public class CalendarEventsController : AuthenticatedControllerBase
     [HttpGet("Next/BookClub", Name = "GetUpcomingBookClubEvent")]
     public async Task<IActionResult> GetUpcomingBookClubEvent()
     {
-        var query = new UpcomingBookClubQuery();
+        var query = new UpcomingBookClubQuery(CurrentUserId);
         var upcomingEvent = await _upcomingBookClubQueryHandler.HandleAsync(query);
         return upcomingEvent is null ? NoContent() : Ok(upcomingEvent);
     }

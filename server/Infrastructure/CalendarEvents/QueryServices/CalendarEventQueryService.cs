@@ -15,7 +15,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
         _context = context;
     }
 
-    public async Task<UpcomingEventResponse?> GetUpcomingEventAsync(CancellationToken cancellationToken = default)
+    public async Task<UpcomingEventResponse?> GetUpcomingEventAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
             .Join(
@@ -32,12 +32,13 @@ public class CalendarEventQueryService : ICalendarEventQueryService
                 x.calendarEvent.Name,
                 x.calendarEvent.Date,
                 x.calendarEvent.EventType,
-                x.user.UserName
+                x.user.UserName,
+                x.user.Id == userId
             ))
             .FirstOrDefaultAsync();
     }
 
-    public async Task<UpcomingEventResponse?> GetUpcomingBookClubEventAsync(CancellationToken cancellationToken = default)
+    public async Task<UpcomingEventResponse?> GetUpcomingBookClubEventAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
             .Join(
@@ -54,12 +55,13 @@ public class CalendarEventQueryService : ICalendarEventQueryService
                 x.calendarEvent.Name,
                 x.calendarEvent.Date,
                 x.calendarEvent.EventType,
-                x.user.UserName
+                x.user.UserName,
+                x.user.Id == userId
             ))
             .FirstOrDefaultAsync();
     }
 
-    public async Task<UpcomingEventResponse?> GetUnscheduledBookClubEventAsync(CancellationToken cancellationToken = default)
+    public async Task<UpcomingEventResponse?> GetUnscheduledBookClubEventAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
             .Join(
@@ -75,7 +77,8 @@ public class CalendarEventQueryService : ICalendarEventQueryService
                 x.calendarEvent.Name,
                 x.calendarEvent.Date,
                 x.calendarEvent.EventType,
-                x.user.UserName
+                x.user.UserName,
+                x.user.Id == userId
             ))
             .FirstOrDefaultAsync();
     }

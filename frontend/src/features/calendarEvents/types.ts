@@ -15,6 +15,7 @@ export type UpcomingEventResponse = {
     date: string; 
     eventType: number;
     hostUserName: string;
+    currentUserIsHost: boolean;
 }
 
 export type EventDetailResponse = {

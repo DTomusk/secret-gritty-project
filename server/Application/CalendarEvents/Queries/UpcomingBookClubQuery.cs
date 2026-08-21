@@ -1,3 +1,3 @@
 ﻿namespace Application.CalendarEvents.Queries;
 
-public record UpcomingBookClubQuery();
+public record UpcomingBookClubQuery(Guid UserId);

@@ -16,6 +16,6 @@ public class UpcomingEventQueryHandler : IQueryHandler<UpcomingEventQuery, Upcom
 
     public async Task<UpcomingEventResponse?> HandleAsync(UpcomingEventQuery query, CancellationToken cancellationToken = default)
     {
-        return await _calendarEventQueryService.GetUpcomingEventAsync();
+        return await _calendarEventQueryService.GetUpcomingEventAsync(query.UserId, cancellationToken);
     }
 }
