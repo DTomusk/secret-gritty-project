@@ -18,6 +18,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
     public async Task<UpcomingEventResponse?> GetUpcomingEventAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
+            .AsNoTracking()
             .Join(
                 _context.Users,
                 calendarEvent => calendarEvent.HostUserId,
@@ -41,6 +42,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
     public async Task<UpcomingEventResponse?> GetUpcomingBookClubEventAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
+            .AsNoTracking()
             .Join(
                 _context.Users,
                 calendarEvent => calendarEvent.HostUserId,
@@ -64,6 +66,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
     public async Task<UpcomingEventResponse?> GetUnscheduledBookClubEventAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
+            .AsNoTracking()
             .Join(
                 _context.Users,
                 calendarEvent => calendarEvent.HostUserId,
@@ -86,6 +89,7 @@ public class CalendarEventQueryService : ICalendarEventQueryService
     public async Task<EventDetailResponse?> GetEventByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.CalendarEvents
+           .AsNoTracking()
            .Join(
                _context.Users,
                calendarEvent => calendarEvent.HostUserId,

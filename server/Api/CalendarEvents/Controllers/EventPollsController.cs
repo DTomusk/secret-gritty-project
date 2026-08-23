@@ -4,6 +4,7 @@ using Api.Shared.RateLimiting;
 using Application.Auth.Interfaces;
 using Application.CalendarEvents.Commands;
 using Application.CalendarEvents.DTOs;
+using Application.CalendarEvents.Queries;
 using Application.Shared.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +18,24 @@ namespace Api.CalendarEvents.Controllers;
 public class EventPollsController : AuthenticatedControllerBase
 {
     private readonly ICommandHandler<CreateEventPollCommand, CreateEventPollResponse> _createEventPollHandler;
+    private readonly IQueryHandler<EventPollsQuery, IEnumerable<EventPollResponse>> _getEventPollsHandler;
 
     public EventPollsController(ICommandHandler<CreateEventPollCommand, CreateEventPollResponse> createEventPollHandler,
-        ICurrentUserService currentUserService) : base(currentUserService)
+        ICurrentUserService currentUserService, IQueryHandler<EventPollsQuery, IEnumerable<EventPollResponse>> getEventPollsHandler) : base(currentUserService)
     {
         _createEventPollHandler = createEventPollHandler;
+        _getEventPollsHandler = getEventPollsHandler;
     }
 
-    [HttpPost("Events/{eventId}/Polls", Name = "CreateEventPoll")]
+    [HttpGet("Events/{eventId:guid}/Polls")]
+    public async Task<IActionResult> GetEventPolls(Guid eventId, CancellationToken cancellationToken)
+    {
+        var query = new EventPollsQuery(eventId);
+        var polls = await _getEventPollsHandler.HandleAsync(query, cancellationToken);
+        return Ok(polls);
+    }
+
+    [HttpPost("Events/{eventId:guid}/Polls", Name = "CreateEventPoll")]
     public async Task<IActionResult> CreateEventPoll(Guid eventId, [FromBody] CreateEventPollRequest request)
     {
         if (!ModelState.IsValid)
