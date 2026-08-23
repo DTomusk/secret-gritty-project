@@ -18,6 +18,13 @@ public class CalendarEventRespository : ICalendarEventRepository
         _context.CalendarEvents.Add(calendarEvent);
     }
 
+    public async Task<CalendarEvent?> GetEventByIdAsync(Guid eventId, CancellationToken cancellationToken = default)
+    {
+        return _context.CalendarEvents
+            .Where(e => e.Id == eventId)
+            .FirstOrDefault();
+    }
+
     public async Task<CalendarEvent?> GetFutureEventByType(CalendarEventType eventType, CancellationToken cancellationToken = default)
     {
         return _context.CalendarEvents

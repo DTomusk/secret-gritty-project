@@ -12,6 +12,8 @@ public static class Register
         services.AddScoped<ICalendarEventRepository, CalendarEventRespository>();
         services.AddScoped<ICalendarEventQueryService, CalendarEventQueryService>();
 
+        services.AddScoped<IEventPollRepository, EventPollRepository>();
+
         return services;
     }
 }

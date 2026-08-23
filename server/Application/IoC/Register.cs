@@ -29,6 +29,7 @@ public static class Register
         services.AddScoped<IQueryHandler<UpcomingEventQuery, UpcomingEventResponse?>, UpcomingEventQueryHandler>();
         services.AddScoped<IQueryHandler<UpcomingBookClubQuery, UpcomingEventResponse?>, UpcomingBookClubQueryHandler>();
         services.AddScoped<IQueryHandler<EventByIdQuery, EventDetailResponse?>, EventByIdQueryHandler>();
+        services.AddScoped<ICommandHandler<CreateEventPollCommand, CreateEventPollResponse>, CreateEventPollCommandHandler>();
 
         // Members handlers
         services.AddScoped<IQueryHandler<GetMembersQuery, IEnumerable<MemberDTO>>, GetMembersQueryHandler>();
