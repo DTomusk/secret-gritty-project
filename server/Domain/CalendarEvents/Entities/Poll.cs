@@ -30,24 +30,9 @@ public class Poll
 
     public void AddOption(PollOption option)
     {
-        if (!OptionValid(option))
-            throw new ArgumentException("Option invalid for this poll type");
-
+        if (this.Type != option.Type)
+            throw new ArgumentException("Option type does not match poll type");
         Options.Add(option);
-    }
-
-    private bool OptionValid(PollOption option)
-    {
-        if (this.Type == PollType.Book && option is not PollBookOption)
-            return false;
-
-        if (this.Type == PollType.Location && option is not PollLocationOption)
-            return false;
-
-        if (this.Type == PollType.Date && option is not PollDateOption)
-            return false;
-
-        return true;
     }
 }
 
@@ -58,23 +43,50 @@ public enum PollType
     Book = 3,
 }
 
-public abstract class PollOption
+public class PollOption
 {
     public Guid Id { get; init; }
-}
+    public PollType Type { get; init; }
+    public string Value { get; init; }
 
-public class PollLocationOption : PollOption
-{
-    public string Location { get; init; }
-}
+    private PollOption() { }
 
-public class PollDateOption : PollOption
-{
-    public DateTime Date { get; init; }
-}
+    public static PollOption CreateLocationOption(string location)
+    {
+        if (string.IsNullOrWhiteSpace(location))
+            throw new ArgumentException("Location cannot be empty");
 
-public class PollBookOption : PollOption
-{
-    public string Title { get; init; }
-    public string Author { get; init; }
+        return new PollOption
+        {
+            Id = Guid.NewGuid(),
+            Type = PollType.Location,
+            Value = location
+        };
+    }
+
+    public static PollOption CreateDateOption(DateTime date)
+    {
+        if (date <= DateTime.UtcNow)
+            throw new ArgumentException("Date must be in the future");
+        return new PollOption
+        {
+            Id = Guid.NewGuid(),
+            Type = PollType.Date,
+            Value = date.ToString("o") // ISO 8601 format
+        };
+    }
+
+    public static PollOption CreateBookOption(string title, string author)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title cannot be empty");
+        if (string.IsNullOrWhiteSpace(author))
+            throw new ArgumentException("Author cannot be empty");
+        return new PollOption
+        {
+            Id = Guid.NewGuid(),
+            Type = PollType.Book,
+            Value = $"{title} by {author}"
+        };
+    }
 }
