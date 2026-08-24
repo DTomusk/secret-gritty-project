@@ -1,7 +1,8 @@
-import { Stack, Typography } from "@mui/material";
-import { BOOK_CLUB_POLL_TYPES, type EventPollResponse, type UpcomingEventResponse } from "../types";
+import { Card, CardHeader, Stack, Typography } from "@mui/material";
+import { BOOK_CLUB_POLL_TYPES, POLL_TYPE_NAMES, type EventPollResponse, type UpcomingEventResponse } from "../types";
 import { useEventPolls } from "../hooks";
-import PollTypeSection from "./PollTypeSection";
+import PollEditForm from "./PollEditForm";
+import PollCreationForm from "./PollCreationForm";
 
 type MyUnscheduledBookClubSectionProps = {
     nextBookClub: UpcomingEventResponse
@@ -24,12 +25,16 @@ export default function MyUnscheduledBookClubSection({ nextBookClub }: MyUnsched
             <Typography variant="h5">You're hosting the next book club!</Typography>
             <Typography>Hey bozo, you haven't scheduled your book club yet!</Typography>
             {pollsByType && BOOK_CLUB_POLL_TYPES.map((pollType) => (
-                <PollTypeSection
-                    key={pollType}
-                    eventId={nextBookClub.id}
-                    poll={pollsByType[pollType]}
-                    pollType={pollType}
-                />
+                <Card key={pollType} sx={{ padding: 2, marginBottom: 2, width: "100%" }}>
+                    <CardHeader
+                        title={<Typography variant="h5">{POLL_TYPE_NAMES[pollType]} poll</Typography>}
+                    />
+                    {pollsByType[pollType] ? (
+                        <PollEditForm poll={pollsByType[pollType]} />
+                    ) : (
+                        <PollCreationForm eventId={nextBookClub.id} pollType={pollType} />
+                    )}
+                </Card>
             ))}
         </Stack>
     );

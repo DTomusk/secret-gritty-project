@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "../components/NavBar";
+import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import Paper from "@mui/material/Paper";
 
 export default function AppLayout() {
     return (
@@ -14,8 +14,7 @@ export default function AppLayout() {
             color="background.default"
         >
             <NavBar />
-            <Paper
-                elevation={0}
+            <Box
                 sx={{
                     flex: 1,
                     minHeight: 0,
@@ -31,7 +30,7 @@ export default function AppLayout() {
                 }}
             >
                 <Outlet />
-            </Paper>
+            </Box>
         </Stack>
     )
 }
