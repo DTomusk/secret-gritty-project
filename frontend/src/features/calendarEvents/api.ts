@@ -1,5 +1,5 @@
 import { api } from "../../lib/api/api"
-import type { EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse, ScheduleEventResponse, ChooseNextHostRequest } from "./types"
+import type { EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse, ScheduleEventResponse, ChooseNextHostRequest, EventPollResponse } from "./types"
 
 export const getUpcomingEvent = async () => {
     return api.get<UpcomingEventResponse>("/Events/Next")
@@ -19,4 +19,8 @@ export const scheduleEvent = async (input: ScheduleEventRequest) => {
 
 export const chooseNextHost = async (input: ChooseNextHostRequest) => {
     return api.post<void>(`/Events/Next/BookClub/Host`, JSON.stringify(input));
+}
+
+export const getPollsByEventId = async (eventId: string) => {
+    return api.get<EventPollResponse[]>(`/Events/${eventId}/Polls`);
 }

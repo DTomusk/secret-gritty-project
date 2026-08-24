@@ -6,6 +6,7 @@ import { useUpcomingBookClub } from "../features/calendarEvents/hooks";
 import { useNavigate } from "react-router-dom";
 import { UpcomingBookClubSection } from "../features/calendarEvents/components/UpcomingBookClubSection";
 import UnscheduledBookClubSection from "../features/calendarEvents/components/UnscheduledBookClubSection";
+import MyUnscheduledBookClubSection from "../features/calendarEvents/components/MyUnscheduledBookClubSection";
 
 export default function HomePage() {
     const username = getUsername();
@@ -22,7 +23,10 @@ export default function HomePage() {
             {nextBookClub && nextBookClub.date && !error && (
                 <UpcomingBookClubSection bookClub={nextBookClub} />
             )}
-            {nextBookClub && !nextBookClub.date && !error && (
+            {nextBookClub && !nextBookClub.date && nextBookClub.currentUserIsHost && !error && (
+                <MyUnscheduledBookClubSection nextBookClub={nextBookClub} />
+            )}
+            {nextBookClub && !nextBookClub.date && !nextBookClub.currentUserIsHost && !error && (
                 <UnscheduledBookClubSection nextBookClub={nextBookClub} />
             )}
             {!nextBookClub && !isLoading && !error && (

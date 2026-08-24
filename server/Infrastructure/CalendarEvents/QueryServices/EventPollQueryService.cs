@@ -21,6 +21,7 @@ public class EventPollQueryService : IEventPollQueryService
             .Where(p => p.EventId == eventId)
             .Select(p => new EventPollResponse(
                 p.Id,
+                p.Type,
                 p.ClosesAt,
                 p.Options.Select(o => new EventPollOptionResponse(o.Id, o.Value))
             ))

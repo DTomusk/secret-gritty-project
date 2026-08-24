@@ -28,3 +28,15 @@ export type EventDetailResponse = {
 export type ChooseNextHostRequest = {
     hostId: string;
 }
+
+export type EventPollResponse = {
+    pollId: string;
+    type: number;
+    closesAt: string; // ISO date string
+    options: EventPollOptionResponse[];
+}
+
+export type EventPollOptionResponse = {
+    optionId: string;
+    optionText: string;
+}

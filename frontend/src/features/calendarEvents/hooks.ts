@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ChooseNextHostRequest, EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types";
-import { chooseNextHost, getEventById, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
+import { chooseNextHost, getEventById, getPollsByEventId, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
 
 export function useUpcomingEvent() {
     return useQuery<UpcomingEventResponse>({
@@ -48,4 +48,14 @@ export function useChooseNextHost() {
             return response;
         }
     });
+}
+
+export function useEventPolls(eventId: string) {
+    return useQuery({
+        queryKey: ["events", eventId, "polls"],
+        queryFn: async () => {
+            const response = await getPollsByEventId(eventId);
+            return response;
+        }
+    })
 }
