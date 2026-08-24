@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import type { ChooseNextHostRequest, EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types";
-import { chooseNextHost, getEventById, getPollsByEventId, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ChooseNextHostRequest, CreateEventPollRequest, EventDetailResponse, ScheduleEventRequest, UpcomingEventResponse } from "./types";
+import { chooseNextHost, createPollForEvent, getEventById, getPollsByEventId, getUpcomingBookClub, getUpcomingEvent, scheduleEvent } from "./api";
 
 export function useUpcomingEvent() {
     return useQuery<UpcomingEventResponse>({
@@ -42,10 +42,17 @@ export function useScheduleEvent() {
 }
 
 export function useChooseNextHost() {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (input: ChooseNextHostRequest) => {
             const response = await chooseNextHost(input);
             return response;
+        },
+        onSuccess: () => {
+            // Invalidate the upcoming book club query to refetch the updated data
+            queryClient.invalidateQueries({
+                queryKey: ["events", "upcoming", "bookclub"],
+            });
         }
     });
 }
@@ -58,4 +65,20 @@ export function useEventPolls(eventId: string) {
             return response;
         }
     })
+}
+
+export function useCreateEventPoll(eventId: string) {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async (input: CreateEventPollRequest) => {
+            const response = await createPollForEvent(eventId, input);
+            return response;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["events", eventId, "polls"],
+            });
+        }
+    });
 }

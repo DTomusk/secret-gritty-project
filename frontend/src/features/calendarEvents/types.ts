@@ -40,3 +40,22 @@ export type EventPollOptionResponse = {
     optionId: string;
     optionText: string;
 }
+
+export const POLL_TYPES = {
+    DATE: 1,
+    LOCATION: 2,
+    BOOK: 3
+} as const;
+
+export const POLL_TYPE_NAMES: Record<number, string> = {
+    [POLL_TYPES.DATE]: "Date",
+    [POLL_TYPES.LOCATION]: "Location",
+    [POLL_TYPES.BOOK]: "Book"
+};
+
+export const BOOK_CLUB_POLL_TYPES = [POLL_TYPES.DATE, POLL_TYPES.LOCATION, POLL_TYPES.BOOK];
+
+export type CreateEventPollRequest = {
+    pollType: number;
+    closesAt: string;
+}

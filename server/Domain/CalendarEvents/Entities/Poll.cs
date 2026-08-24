@@ -12,7 +12,13 @@ public class Poll
 
     public static Poll Create(CalendarEvent @event, PollType type, DateTime closesAt)
     {
-        if (closesAt <= DateTime.UtcNow)
+        var closesAtUtc = closesAt.Kind == DateTimeKind.Local
+        ? closesAt.ToUniversalTime()
+        : closesAt.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(closesAt, DateTimeKind.Utc)
+            : closesAt;
+
+        if (closesAtUtc <= DateTime.UtcNow)
             throw new ArgumentException("Poll must close in the future");
 
         if (type == PollType.Book && @event.EventType != CalendarEventType.BookClub)
@@ -23,7 +29,7 @@ public class Poll
             Id = Guid.NewGuid(),
             EventId = @event.Id,
             Type = type,
-            ClosesAt = closesAt,
+            ClosesAt = closesAtUtc,
             Options = new List<PollOption>()
         };
     }
