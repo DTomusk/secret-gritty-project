@@ -41,7 +41,13 @@ public class EventPollsController : AuthenticatedControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var command = new CreateEventPollCommand(eventId, CurrentUserId, request.PollType, request.ClosesAt);
+        var command = new CreateEventPollCommand(eventId, CurrentUserId, request.PollType, request.ClosesAt, request.Options.Select(o => new CreateEventPollOptionsRequest
+        {
+            Location = o.Location,
+            Date = o.Date,
+            Title = o.Title,
+            Author = o.Author
+        }).ToArray());
         var result = await _createEventPollHandler.HandleAsync(command);
         if (!result.IsSuccess)
             return BadRequest(result.Error);

@@ -20,16 +20,14 @@ export default function MyUnscheduledBookClubSection({ nextBookClub }: MyUnsched
     }, {} as Record<number, EventPollResponse>);
     
     return (
-        <Stack spacing={2} sx={{ textAlign: "left", justifyContent: 'center', alignItems: 'start' }}>
-            <Typography variant="h5">Next Book Club</Typography>
-            <Typography>Hey bozo, you haven't scheduled the book club yet!</Typography>
-            <Typography>Book Club Name: {nextBookClub.name}</Typography>
-            <Typography>Host: {nextBookClub.hostUserName}</Typography>
+        <Stack spacing={2} sx={{ textAlign: "left", width: "100%", padding: 1 }}>
+            <Typography variant="h5">You're hosting the next book club!</Typography>
+            <Typography>Hey bozo, you haven't scheduled your book club yet!</Typography>
             {pollsByType && BOOK_CLUB_POLL_TYPES.map((pollType) => (
                 <PollTypeSection
                     key={pollType}
                     eventId={nextBookClub.id}
-                    pollId={pollsByType[pollType]?.pollId}
+                    poll={pollsByType[pollType]}
                     pollType={pollType}
                 />
             ))}

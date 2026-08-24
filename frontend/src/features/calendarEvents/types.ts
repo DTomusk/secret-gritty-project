@@ -58,4 +58,12 @@ export const BOOK_CLUB_POLL_TYPES = [POLL_TYPES.DATE, POLL_TYPES.LOCATION, POLL_
 export type CreateEventPollRequest = {
     pollType: number;
     closesAt: string;
+    options: PollOptionsRequest[];
+}
+
+export type PollOptionsRequest = {
+    date?: string; // ISO date string
+    location?: string;
+    title?: string;
+    author?: string;
 }

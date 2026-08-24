@@ -39,6 +39,17 @@ public class CreateEventPollCommandHandler : ICommandHandler<CreateEventPollComm
 
         // Create the poll and persist
         var poll = Poll.Create(calendarEvent, command.PollType, command.ClosesAt);
+
+        foreach (var option in command.Options)
+        {
+            if (command.PollType == PollType.Date && option.Date.HasValue)
+                poll.AddDateOption(option.Date.Value);
+            else if (command.PollType == PollType.Location && !string.IsNullOrWhiteSpace(option.Location))
+                poll.AddLocationOption(option.Location);
+            else if (command.PollType == PollType.Book && !string.IsNullOrWhiteSpace(option.Title) && !string.IsNullOrWhiteSpace(option.Author))
+                poll.AddBookOption(option.Title, option.Author);
+        }
+
         await _eventPollRepository.CreateEventPollAsync(poll, cancellationToken);
         await _unitOfWork.CommitAsync(cancellationToken);
 
