@@ -14,7 +14,12 @@ export default function HomePage() {
     const navigate = useNavigate();
 
     return (
-        <Stack spacing={2} sx={{ mt: 2, justifyContent: 'center', alignItems: 'center' }}>
+        <Stack spacing={2} sx={{ 
+            mt: 2, 
+            justifyContent: 'center', 
+            alignItems: 'center' ,
+            width: {xs: "100%", sm: "80%", md: "60%", lg: "50%"},
+        }}>
             <Typography variant="h1">
                 {username ? `Hi, ${username}!` : "Welcome, guest"}
             </Typography>

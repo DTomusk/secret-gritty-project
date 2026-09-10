@@ -12,7 +12,6 @@ export default function FormWrapper({ children, ...props }: FormWrapperProps) {
             sx={{
                 width: "100%",
                 minWidth: "300px",
-                maxWidth: "500px",
                 ...props.sx,
             }}
         >

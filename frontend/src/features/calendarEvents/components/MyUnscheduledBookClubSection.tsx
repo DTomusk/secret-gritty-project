@@ -23,7 +23,7 @@ export default function MyUnscheduledBookClubSection({ nextBookClub }: MyUnsched
     return (
         <Stack spacing={2} sx={{ textAlign: "left", width: "100%", padding: 1 }}>
             <Typography variant="h5">You're hosting the next book club!</Typography>
-            <Typography>Hey bozo, you haven't scheduled your book club yet!</Typography>
+            <Typography>Hey bozo, you haven't scheduled your book club in yet! Add options to the following polls so we can vote on the details of the next meetup.</Typography>
             {pollsByType && BOOK_CLUB_POLL_TYPES.map((pollType) => (
                 <Card key={pollType} sx={{ padding: 2, marginBottom: 2, width: "100%" }}>
                     <CardHeader
