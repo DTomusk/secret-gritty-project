@@ -54,6 +54,11 @@ public class Poll
             throw new ArgumentException("Option type does not match poll type");
         Options.Add(PollOption.CreateLocationOption(this.Id, location));
     }
+
+    public void DeleteOptions()
+    {
+        Options.Clear();
+    }
 }
 
 public enum PollType

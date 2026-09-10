@@ -19,10 +19,22 @@ public class EventPollRepository : IEventPollRepository
         _context.Polls.Add(poll);
     }
 
+    public async Task<Poll?> GetEventPollByPollIdAsync(Guid pollId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Polls
+            .Include(p => p.Options)
+            .FirstOrDefaultAsync(p => p.Id == pollId, cancellationToken);
+    }
+
     public async Task<IEnumerable<Poll>> GetEventPollsByEventIdAsync(Guid eventId, CancellationToken cancellationToken = default)
     {
         return await _context.Polls
             .Where(p => p.EventId == eventId)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateEventPollAsync(Poll poll, CancellationToken cancellationToken = default)
+    {
+        _context.Polls.Update(poll);
     }
 }
